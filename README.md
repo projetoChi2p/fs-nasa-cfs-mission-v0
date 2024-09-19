@@ -1,7 +1,8 @@
 # fs-nasa-cfs-mission-v0
 
-This repository contain the Flight-SIHFT project mission source code. 
+This repository contain the Flight-SIHFT project mission source code.
 It was utilized the NASA cFS architecture, and all the mission was built upon it.
+
 For more information about cFS : <https://github.com/nasa/cFS>
 
 The mission is composed by two benchmark applications: a fixed-point matrix multiplication benchmarck(mxm_app) and Huffman encoding and decoding benchmark (huff_app).
@@ -16,26 +17,18 @@ The TO application subscribes to these benchmark result messages and presents th
 
 # Build
 The mission build process is simplified by the scripts, to have more information about it, check the oficial cFS documentation.
-'''
 
-./01-fbv-build-obdh-v0.sh
-'''
+    ./01-fbv-build-obdh-v0.sh
 
 # Run
 To get the firmware ID
-'''
-
-udevadm info -q property -p $(udevadm info -q path -n /dev/ttyACM0) | grep ID_SERIAL
-'''
+    udevadm info -q property -p $(udevadm info -q path -n /dev/ttyACM0) | grep ID_SERIAL
 
 To program the NUCLEO-F767ZI:
-'''
 
-openocd -s /usr/share/openocd/scripts/  --file board/stm32f7discovery.cfg --command "hla_serial ID_SERIAL_SHORT; program file.elf verify reset exit"
-'''
+    openocd -s /usr/share/openocd/scripts/  --file board/stm32f7discovery.cfg --command "hla_serial ID_SERIAL_SHORT; program file.elf verify reset exit"
 
 
-It works similar to the NASA cFS sample mission bundle (https://github.com/nasa/cFS), but excluding applications, libraries and cFS executive components required to a complete mission.
 
 The initial version of this repository was based on NASA cFS sample mission bundle (https://github.com/nasa/cFS) equuleus-rc1 **plus** developments up to 2024-01-31 with the following commit signatures:
 
