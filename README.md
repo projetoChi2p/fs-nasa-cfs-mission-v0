@@ -22,6 +22,7 @@ The mission build process is simplified by the scripts, to have more information
 
 # Run
 To get the firmware ID
+
     udevadm info -q property -p $(udevadm info -q path -n /dev/ttyACM0) | grep ID_SERIAL
 
 To program the NUCLEO-F767ZI:
