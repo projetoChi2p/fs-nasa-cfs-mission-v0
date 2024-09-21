@@ -1,12 +1,12 @@
 [submodule "cfe"]
 	path = cfe
-	url = https://github.com/projetoChi2p/cFE.git
+	url = https://github.com/projetoChi2p/fs-nasa-cfs-cfe.git
 [submodule "osal"]
 	path = osal
-	url = https://github.com/projetoChi2p/osal.git
+	url = https://github.com/projetoChi2p/fs-nasa-cfs-osal.git
 [submodule "psp"]
 	path = psp
-	url = https://github.com/projetoChi2p/PSP.git
+	url = https://github.com/projetoChi2p/fs-nasa-cfs-psp.git
 [submodule "tools/cFS-GroundSystem"]
 	path = tools/cFS-GroundSystem
 	url = https://github.com/nasa/cFS-GroundSystem.git
@@ -18,7 +18,7 @@
 	url = https://github.com/nasa/tblCRCTool.git
 [submodule "libs/bench_lib"]
 	path = libs/bench_lib
-	url = https://github.com/projetoChi2p/bench_lib.git
+	url = https://github.com/projetoChi2p/fs-nasa-cfs-bench_lib.git
 [submodule "libs/sample_lib"]
 	path = libs/sample_lib
 	url = https://github.com/nasa/sample_lib.git
@@ -27,19 +27,19 @@
 	url = https://github.com/nasa/ci_lab.git
 [submodule "apps/huff_app"]
 	path = apps/huff_app
-	url = https://github.com/projetoChi2p/huff_app.git
+	url = https://github.com/projetoChi2p/fs-nasa-cfs-huff_app.git
 [submodule "apps/mxm_app"]
 	path = apps/mxm_app
-	url = https://github.com/projetoChi2p/mxm_app.git
+	url = https://github.com/projetoChi2p/fs-nasa-cfs-mxm_app.git
 [submodule "apps/sample_app"]
 	path = apps/sample_app
 	url = https://github.com/nasa/sample_app.git
 [submodule "apps/sch_lab"]
 	path = apps/sch_lab
-	url = https://github.com/projetoChi2p/sch_lab.git
+	url = https://github.com/projetoChi2p/fs-nasa-cfs-sch_lab.git
 [submodule "apps/to_con"]
 	path = apps/to_con
-	url = https://github.com/projetoChi2p/to_con.git
+	url = https://github.com/projetoChi2p/fs-nasa-cfs-to_con.git
 [submodule "apps/to_lab"]
 	path = apps/to_lab
 	url = https://github.com/nasa/to_lab.git
