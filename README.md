@@ -25,7 +25,7 @@ To get the firmware ID
 
     udevadm info -q property -p $(udevadm info -q path -n /dev/ttyACM0) | grep ID_SERIAL
 
-To program the NUCLEO-F767ZI:
+To program the NUCLEO-F767ZI
 
     openocd -s /usr/share/openocd/scripts/  --file board/stm32f7discovery.cfg --command "hla_serial ID_SERIAL_SHORT; program file.elf verify reset exit"
 
