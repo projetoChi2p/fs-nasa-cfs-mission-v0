@@ -18,7 +18,7 @@ The TO application subscribes to these benchmark result messages and presents th
 # Build
 The mission build process is simplified by the scripts, to have more information about it, check the oficial cFS documentation.
 
-    ./01-fbv-build-obdh-v0.sh
+    ./build-mission-nucleo-f767-freertos.sh
 
 # Run
 To get the firmware ID
