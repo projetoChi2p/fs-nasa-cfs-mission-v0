@@ -16,15 +16,15 @@ The TO application subscribes to these benchmark result messages and presents th
     git submodule update
 
 # Build
-The mission build process is simplified by the scripts, to have more information about it, check the oficial cFS documentation.
+The unit test build process is simplified by scripts. For more information, check the official cFS documentation.
 
     ./build-mission-nucleo-f767-freertos.sh
 
 # Run
-To get the firmware ID
+To get the board ID:
 
     udevadm info -q property -p $(udevadm info -q path -n /dev/ttyACM0) | grep ID_SERIAL_SHORT
 
-To program the NUCLEO-F767ZI
+To program the NUCLEO-F767ZI:
 
     openocd -s /usr/share/openocd/scripts/  --file board/stm32f7discovery.cfg --command "hla_serial ID_SERIAL_SHORT; program path/to/file.elf verify reset exit"
