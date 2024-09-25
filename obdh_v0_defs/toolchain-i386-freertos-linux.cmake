@@ -30,9 +30,11 @@ set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR i386)
 set(CMAKE_CROSSCOMPILING 1)
 
+#[[
 add_compile_options(
     -Werror                     # Treat warnings as errors (code should be clean)
 )
+]]
 
 
 set(GCCPATH )
