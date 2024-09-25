@@ -174,6 +174,9 @@ include_directories(${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor/CMS
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor/CMSIS/Device/ST/STM32F7xx/Include)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor/STM32F7xx_HAL_Driver/Inc)
 
+# Include FreeRTOSConfig.h
+include_directories(${OSAL_SOURCE_DIR}/../obdh_v0_defs/)
+
  set(COMPILER_LINKER_OPTION_PREFIX "-Wl,")
  set(START_WHOLE_ARCHIVE "--whole-archive")
  set(STOP_WHOLE_ARCHIVE  "--no-whole-archive")
