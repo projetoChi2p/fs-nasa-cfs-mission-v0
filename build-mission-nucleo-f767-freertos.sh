@@ -5,7 +5,7 @@
 MAKEFILE=Makefile
 MISSIONCONFIG="obdh_v0"
 
-JOBS="-"
+JOBS="-j 6"
 SIMULATION="nucleo-f767-freertos"
 
 # ``SIMULATION``: If set, this will override the architecture(s) specified 
