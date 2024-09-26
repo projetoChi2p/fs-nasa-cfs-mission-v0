@@ -135,6 +135,9 @@ include_directories(${PSP_SOURCE_DIR}/fsw/shared-freertos/inc)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/vendor)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor)
 
+# Include FreeRTOSConfig.h
+include_directories(${OSAL_SOURCE_DIR}/../obdh_v0_defs/)
+
 # FBV 2024-02-28 The include_directories below is only for debugging and should removed from final build.
 include_directories(${CFE_SOURCE_DIR}/modules/es/fsw/src)
 include_directories(${CFE_SOURCE_DIR}/modules/core_private/fsw/inc)
