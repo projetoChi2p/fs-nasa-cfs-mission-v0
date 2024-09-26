@@ -1,7 +1,6 @@
 # fs-nasa-cfs-mission-v0
 
-This repository contain the Flight-SIHFT project mission source code.
-It was utilized the NASA cFS architecture, and all the mission was built upon it.
+This repository contains the Flight-SIHFT project mission source code. The NASA cFS architecture was utilized, and the entire mission was built upon it.
 
 For more information about cFS : <https://github.com/nasa/cFS>
 
