@@ -104,7 +104,7 @@ GET_FILENAME_COMPONENT(CFE_SOURCE_DIR      "${TOP_PROJECT_DIR}/cfe"         REAL
 set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/include-freertos-v10.2.1-stm32cubel4")
 set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos-v10.2.1-stm32cubel4")
 #set(OSAL_FREERTOS_CONFIG_H_DIR     "${THIRDPARTY_DIR}/bsp-pc-linux-i386/inc")
-set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat-2024-01-25-dev")
+set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat")
 
 message("+++ Using MY_MISSION_DEFS_DIR '${MY_MISSION_DEFS_DIR}'.")
 message("+++ Using TOP_PROJECT_DIR '${TOP_PROJECT_DIR}'.")

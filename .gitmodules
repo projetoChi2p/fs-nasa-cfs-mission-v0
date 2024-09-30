@@ -31,3 +31,9 @@
 [submodule "apps/to_con"]
 	path = apps/to_con
 	url = https://github.com/projetoChi2p/fs-nasa-cfs-to_con.git
+[submodule "third-party/freertos-plus-fat"]
+	path = third-party/freertos-plus-fat
+	url = https://github.com/FreeRTOS/Lab-Project-FreeRTOS-FAT.git
+[submodule "third-party/freertos"]
+	path = third-party/freertos
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git

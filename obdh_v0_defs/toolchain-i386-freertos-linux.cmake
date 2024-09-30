@@ -67,9 +67,9 @@ GET_FILENAME_COMPONENT(OSAL_SOURCE_DIR     "${TOP_PROJECT_DIR}/osal"        REAL
 GET_FILENAME_COMPONENT(PSP_SOURCE_DIR      "${TOP_PROJECT_DIR}/psp"         REALPATH )
 
 set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/include-freertos-v10.5.1-gcc-posix")
-set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1-v202212.01-gcc-posix")
+set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos")
 #set(OSAL_FREERTOS_CONFIG_H_DIR     "${THIRDPARTY_DIR}/bsp-pc-linux-i386/inc")
-set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat-2024-01-25-dev")
+set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat")
 
 message("+++ Using MY_MISSION_DEFS_DIR '${MY_MISSION_DEFS_DIR}'.")
 message("+++ Using TOP_PROJECT_DIR '${TOP_PROJECT_DIR}'.")
