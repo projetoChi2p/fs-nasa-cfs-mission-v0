@@ -66,7 +66,7 @@ GET_FILENAME_COMPONENT(THIRDPARTY_DIR      "${TOP_PROJECT_DIR}/third-party" REAL
 GET_FILENAME_COMPONENT(OSAL_SOURCE_DIR     "${TOP_PROJECT_DIR}/osal"        REALPATH )
 GET_FILENAME_COMPONENT(PSP_SOURCE_DIR      "${TOP_PROJECT_DIR}/psp"         REALPATH )
 
-set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/include-freertos-v10.5.1-gcc-posix")
+set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/include")
 set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos")
 #set(OSAL_FREERTOS_CONFIG_H_DIR     "${THIRDPARTY_DIR}/bsp-pc-linux-i386/inc")
 set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat")
@@ -87,8 +87,6 @@ message("+++ Using OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 
 
 # FreeRTOS
-#include_directories(${OSAL_FREERTOS_CONFIG_H_DIR})
-include_directories(${OSAL_FREERTOS_INC_DIR})
 include_directories(${OSAL_FREERTOS_SRC_DIR}/include)
 include_directories(${OSAL_FREERTOS_SRC_DIR}/portable/ThirdParty/GCC/Posix)
 

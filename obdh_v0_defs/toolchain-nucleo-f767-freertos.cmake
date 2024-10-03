@@ -101,8 +101,8 @@ GET_FILENAME_COMPONENT(CFE_SOURCE_DIR      "${TOP_PROJECT_DIR}/cfe"         REAL
 # -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 
-set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/include-freertos-v10.2.1-stm32cubel4")
-set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos-v10.2.1-stm32cubel4")
+set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/include")
+set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos")
 #set(OSAL_FREERTOS_CONFIG_H_DIR     "${THIRDPARTY_DIR}/bsp-pc-linux-i386/inc")
 set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat")
 
@@ -123,7 +123,6 @@ message("+++ Using OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 
 # FreeRTOS
 #include_directories(${OSAL_FREERTOS_CONFIG_H_DIR})
-include_directories(${OSAL_FREERTOS_INC_DIR})
 include_directories(${OSAL_FREERTOS_SRC_DIR}/include)
 include_directories(${OSAL_FREERTOS_SRC_DIR}/portable/GCC/ARM_CM4F)
 
