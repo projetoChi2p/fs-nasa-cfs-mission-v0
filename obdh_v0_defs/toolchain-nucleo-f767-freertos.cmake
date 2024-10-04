@@ -40,6 +40,7 @@ set(CMAKE_CROSSCOMPILING 1)
 
 add_compile_options(
     #-std=c99                    # Target the C99 standard (without gcc extensions)
+    -Werror                     # Treat warnings as errors (code should be clean)
 )
 
 # We are reusing STM HAL for STM32
