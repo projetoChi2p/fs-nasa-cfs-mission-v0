@@ -294,7 +294,7 @@
 **  \par Limits
 **      Not Applicable
 */
-#define CFE_MISSION_EVS_MAX_MESSAGE_LENGTH 122
+#define CFE_MISSION_EVS_MAX_MESSAGE_LENGTH 200 // 122
 
 /******************************************************************************
  *   CFE File Services (CFE_FS) Public Definitions
@@ -338,7 +338,7 @@
 **      checked against this configuration are defined by a 16 bit data word.
 */
 //#define CFE_MISSION_SB_MAX_SB_MSG_SIZE 32768
-#define CFE_MISSION_SB_MAX_SB_MSG_SIZE 512
+#define CFE_MISSION_SB_MAX_SB_MSG_SIZE 512 // 512
 
 /**
 **  \cfesbcfg Maximum Number of pipes that SB command/telemetry messages may hold
@@ -355,7 +355,7 @@
 **       to exceed the max length.
 **
 */
-#define CFE_MISSION_SB_MAX_PIPES 64
+#define CFE_MISSION_SB_MAX_PIPES 64 // 64
 
 /******************************************************************************
  *   CFE Table Services (CFE_TBL) Application Public Definitions
@@ -492,7 +492,7 @@
 **       0 to 999,999 decimal
 */
 #define CFE_MISSION_TIME_MIN_ELAPSED 0
-#define CFE_MISSION_TIME_MAX_ELAPSED 200000
+#define CFE_MISSION_TIME_MAX_ELAPSED 999999 // 200000
 
 /**
 **  \cfetimecfg Default Time Values

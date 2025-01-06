@@ -36,28 +36,41 @@ add_compile_options(
 )
 ]]
 
+add_compile_options(
+    -Wfatal-errors              # Stop on first compilation error
+)
 
-set(GCCPATH )
-set(GCCPREFIX )
+set(OSAL_RAMDISK_FILESYSTEM_IS_MFS True)
+set(CMAKE_VERBOSE_MAKEFILE true)
 
 
-# toolchain is installed to $PATH in Docker container
-set(CMAKE_C_COMPILER            "${GCCPREFIX}gcc")
-set(CMAKE_CXX_COMPILER          "${GCCPREFIX}g++")
-set(CMAKE_AS                    "${GCCPREFIX}as")
-set(CMAKE_ASM_COMPILER          "${GCCPREFIX}gcc")
-set(CMAKE_OBJCOPY               "objcopy")
-set(CMAKE_OBJDUMP               "objdump")
-set(CMAKE_SIZE                  "size")
-set(CMAKE_AR                    "${GCCPREFIX}ar" CACHE FILEPATH "archiver-bug") # https://stackoverflow.com/a/43777707/1545769
+set(GCCPREFIX "x86_64-linux-gnu-")
 
-#add_definitions(-include osconfig.h)
+find_program(CMAKE_C_COMPILER
+  NAMES ${GCCPREFIX}gcc
+  HINTS
+    "/usr/bin/gcc"
+  DOC "Find GNU GCC Toolchain"
+  REQUIRED
+)
 
-#set(DOCKER_HOST_PROJECT_DIR "$ENV{DOCKER_HOST_PROJECT_DIR}")
-#set(DOCKER_CONTAINER_PROJECT_DIR "$ENV{DOCKER_CONTAINER_PROJECT_DIR}")
-#if(NOT DOCKER_HOST_PROJECT_DIR OR NOT DOCKER_CONTAINER_PROJECT_DIR)
-#    message(FATAL_ERROR "You must export the environment variable \${DOCKER_HOST_PROJECT_DIR} \${DOCKER_CONTAINER_PROJECT_DIR}.")
-#endif()
+GET_FILENAME_COMPONENT(GCCPATH      "${CMAKE_C_COMPILER}"                 DIRECTORY)
+string(APPEND GCCPATH "/")
+
+message("+++ Using GCC from '${GCCPATH}'.")
+
+set(CMAKE_C_COMPILER            "${GCCPATH}${GCCPREFIX}gcc")
+set(CMAKE_CXX_COMPILER          "${GCCPATH}${GCCPREFIX}g++")
+set(CMAKE_AS                    "${GCCPATH}${GCCPREFIX}as")
+set(CMAKE_ASM_COMPILER          "${GCCPATH}${GCCPREFIX}gcc")
+set(CMAKE_OBJCOPY               "${GCCPATH}${GCCPREFIX}objcopy")
+set(CMAKE_OBJDUMP               "${GCCPATH}${GCCPREFIX}objdump")
+set(CMAKE_SIZE                  "${GCCPATH}${GCCPREFIX}size")
+set(CMAKE_AR                    "${GCCPATH}${GCCPREFIX}ar")
+
+# FBV 2024-12-03 Workaround for Ubuntu Linux 22 with GCC 11 for -m32
+# See also $ gcc -m32 -v -x c /dev/null -c
+include_directories(/usr/i686-linux-gnu/include)
 
 
 GET_FILENAME_COMPONENT(MY_MISSION_DEFS_DIR "${CMAKE_CURRENT_LIST_FILE}"     DIRECTORY)
@@ -65,11 +78,17 @@ GET_FILENAME_COMPONENT(TOP_PROJECT_DIR     "${MY_MISSION_DEFS_DIR}/../"     REAL
 GET_FILENAME_COMPONENT(THIRDPARTY_DIR      "${TOP_PROJECT_DIR}/third-party" REALPATH )
 GET_FILENAME_COMPONENT(OSAL_SOURCE_DIR     "${TOP_PROJECT_DIR}/osal"        REALPATH )
 GET_FILENAME_COMPONENT(PSP_SOURCE_DIR      "${TOP_PROJECT_DIR}/psp"         REALPATH )
+GET_FILENAME_COMPONENT(CFE_SOURCE_DIR      "${TOP_PROJECT_DIR}/cfe"         REALPATH )
 
-set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/include-freertos-v10.5.1-gcc-posix")
-set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1-v202212.01-gcc-posix")
-#set(OSAL_FREERTOS_CONFIG_H_DIR     "${THIRDPARTY_DIR}/bsp-pc-linux-i386/inc")
-set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat-2024-01-25-dev")
+
+set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1/include")
+set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1")
+
+if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
+    set(OSAL_XILINX_MFS_SRC_DIR        "${THIRDPARTY_DIR}/xilinx-xilmfs-v2.3+")
+else()
+    set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat-2024-01-25-dev")
+endif()
 
 message("+++ Using MY_MISSION_DEFS_DIR '${MY_MISSION_DEFS_DIR}'.")
 message("+++ Using TOP_PROJECT_DIR '${TOP_PROJECT_DIR}'.")
@@ -78,25 +97,27 @@ message("+++ Inside toolchain cmake ${CMAKE_CURRENT_LIST_FILE}.")
 message("+++ Using OSAL_FREERTOS_INC_DIR '${OSAL_FREERTOS_INC_DIR}'.")
 message("+++ Using OSAL_FREERTOS_SRC_DIR '${OSAL_FREERTOS_SRC_DIR}'.")
 message("+++ Using OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
-#message("+++ Using CMAKE_BINARY_DIR '${CMAKE_BINARY_DIR}'.")
-#message("+++ Using CMAKE_CURRENT_SOURCE_DIR '${CMAKE_CURRENT_SOURCE_DIR}'.")
-#message("+++ Using OSAL_API_INCLUDE_DIRECTORIES '${OSAL_API_INCLUDE_DIRECTORIES}'.")
-#message("+++ Using PROJECT_SOURCE_DIR '${PROJECT_SOURCE_DIR}'.")
-#message("+++ Using MISSION_DEFS '${MISSION_DEFS}'.")
-#message("+++ Using BSPTYPE '${OSAL_SYSTEM_BSPTYPE}'.")
 
 
 # FreeRTOS
-#include_directories(${OSAL_FREERTOS_CONFIG_H_DIR})
-include_directories(${OSAL_FREERTOS_INC_DIR})
-include_directories(${OSAL_FREERTOS_SRC_DIR}/include)
-include_directories(${OSAL_FREERTOS_SRC_DIR}/portable/ThirdParty/GCC/Posix)
-
-# FreeRTOS + FAT
 include_directories(
-    ${OSAL_FREERTOS_PLUS_FAT_SRC_DIR}
-    ${OSAL_FREERTOS_PLUS_FAT_SRC_DIR}/include
+    ${OSAL_FREERTOS_INC_DIR}
+    ${OSAL_FREERTOS_SRC_DIR}/include
+    ${OSAL_FREERTOS_SRC_DIR}/portable/ThirdParty/GCC/Posix
 )
+
+if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
+    # Xilinx Memory Filesystem
+    include_directories(
+        ${OSAL_XILINX_MFS_SRC_DIR}/src
+    )
+else()
+    # FreeRTOS + FAT Filesystem
+    include_directories(
+        ${OSAL_FREERTOS_PLUS_FAT_SRC_DIR}
+        ${OSAL_FREERTOS_PLUS_FAT_SRC_DIR}/include
+    )
+endif()
 
 
 # OSAL
@@ -109,29 +130,43 @@ set(OSAL_SYSTEM_BSPTYPE     "pc-freertos-linux")
 set(OSAL_SYSTEM_OSTYPE      "freertos")
 
 
-#set(GDB_FLAGS "-g3 -O0 -fdebug-prefix-map=${DOCKER_CONTAINER_PROJECT_DIR}=${DOCKER_HOST_PROJECT_DIR}")
-set(GDB_FLAGS "-g3 -O0")
-set(MCPU_FLAGS "-m32")
-set(CMAKE_C_FLAGS "${GDB_FLAGS} ${MCPU_FLAGS} ${VFP_FLAGS} -Wall -fno-builtin -std=gnu11 -fmessage-length=0 -ffunction-sections -fdata-sections" CACHE INTERNAL "c compiler flags" FORCE)
-set(CMAKE_CXX_FLAGS "${GDB_FLAGS} ${MCPU_FLAGS} ${VFP_FLAGS} -Wall -fno-builtin -fmessage-length=0 -ffunction-sections -fdata-sections" CACHE INTERNAL "cxx compiler flags")
-set(CMAKE_ASM_FLAGS "${GDB_FLAGS} ${MCPU_FLAGS} -x assembler-with-cpp" CACHE INTERNAL "asm compiler flags")
-#set(CMAKE_EXE_LINKER_FLAGS "-specs=nano.specs --specs=rdimon.specs -lc -lrdimon" CACHE INTERNAL "exe link flags" FORCE)
-set(CMAKE_EXE_LINKER_FLAGS "-lc -pthread" CACHE INTERNAL "exe link flags" FORCE)
 
-#set(LINKER_SCRIPT "$ENV{LINKER_SCRIPT}")
-#if(NOT DEFINED LINKER_SCRIPT)
-#    message(FATAL_ERROR "You must export the environment variable \${LINKER_SCRIPT}.")
-#endif()
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Map,link.map" CACHE INTERNAL "exe link flags" FORCE)
+# CMake default are:
+# - Release: -O3
+# - RelWithDebInfo: -O2
+# - Debug: -g
+# GCC default are:
+# -O0
+
+set(CMAKE_C_FLAGS_RELEASE          "          -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_ASM_FLAGS_RELEASE        "          -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_C_FLAGS_RELWITHDEBINFO   "-g3 -ggdb -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_ASM_FLAGS_RELWITHDEBINFO "-g3 -ggdb -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_C_FLAGS_DEBUG            "-g3 -ggdb -O1 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_ASM_FLAGS_DEBUG          "-g3 -ggdb -O1 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+
+
+add_compile_options(-Wall)
+add_compile_options(-m32) # i386 32 bits machine
+add_compile_options(-fno-builtin)
+add_compile_options(-std=gnu11)
+add_compile_options(-fmessage-length=0)
+add_compile_options(-ffunction-sections -fdata-sections)
+
+add_link_options(-m32)
+add_link_options(-lc)
+add_link_options(-pthread)
+add_link_options(-Wl,-Map=link.map) # Note: the same map file is being used for all programs! You may need to build a single target to get the correct map.
+
+#set(CMAKE_ASM_FLAGS "-m32 -x assembler-with-cpp" CACHE INTERNAL "asm compiler flags")
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM   NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY   NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE   NEVER)
 
-
-
 include_directories(${PSP_SOURCE_DIR}/fsw/shared-freertos/inc)
 
+include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/src)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/vendor)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor)
 
@@ -143,3 +178,41 @@ include_directories(${CFE_SOURCE_DIR}/modules/es/fsw/src)
 include_directories(${CFE_SOURCE_DIR}/modules/core_private/fsw/inc)
 include_directories(${CFE_SOURCE_DIR}/modules/msg/fsw/inc)
 include_directories(${CFE_SOURCE_DIR}/modules/core_api/fsw/inc)
+
+
+message("+++ TARGETSYSTEM '${TARGETSYSTEM}'.")
+message("+++ OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
+message("+++ CMAKE_CURRENT_BINARY_DIR '${CMAKE_CURRENT_BINARY_DIR}'.")
+
+
+# These OSAL configurations are specific to FreeRTOS and 
+# have no mapping in osconfig.h.in
+add_definitions(-DOS_TIMEBASE_TASK_STACK_SIZE=2048) # OSAL semantics, size in bytes
+add_definitions(-DOS_TIMEBASE_TASK_PRIORITY=25)     # OSAL semantics, lower value is lower priority
+add_definitions(-DPSP_CFE_TASK_STACK_SIZE_BYTES=4096)
+add_definitions(-DPSP_CFE_TASK_PRIORITY=150)
+add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=128)
+add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
+add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
+
+
+if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
+    #add_definitions(-DOS_FILESYSTEM_ROMDISK_IS_XILMFS=1) # Uses Xilinx MFS for ROM disks
+    add_definitions(-DOS_FILESYSTEM_RAMDISK_IS_XILMFS=1) # Uses Xilinx MFS for RAM disks
+
+    add_definitions(-DMFS_MAX_LOCAL_ENT=4)        # One entry takes (~ 8 + MFS_MAX_FILENAME_LENGTH) bytes
+    add_definitions(-DMFS_BLOCK_DATA_SIZE=128)    # Must be same as CFE_PLATFORM_ES_RAM_DISK_SECTOR_SIZE
+    add_definitions(-DMFS_MAX_FILENAME_LENGTH=20) # Must be >= OSAL_CONFIG_MAX_FILE_NAME
+    add_definitions(-DMFS_MAX_OPEN_FILES=4)       # Must be >= OSAL_CONFIG_MAX_NUM_OPEN_FILES+OSAL_CONFIG_MAX_NUM_OPEN_DIRS
+    add_definitions(-DMFS_MAX_FILESYSTEM=2)       # Must be >= OSAL_CONFIG_MAX_FILE_SYSTEMS
+endif()
+
+# These FreeRTOS configurations are applied to FreeRTOSConfig.h.in
+set (FREERTOS_PLATFORM_STACK_MIN_WORDS   "(PTHREAD_STACK_MIN/4)" ) # Is portSTACK_TYPE unsigned long?
+math(EXPR FREERTOS_PLATFORM_HEAP_SIZE_BYTES "(256*1024)+(2048*512)")
+
+
+configure_file("${MY_MISSION_DEFS_DIR}/FreeRTOSConfig.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/inc/FreeRTOSConfig.h")
+
+message("+++ Leaving  toolchain cmake ${CMAKE_CURRENT_LIST_FILE}.")

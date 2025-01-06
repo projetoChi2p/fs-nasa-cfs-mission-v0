@@ -118,16 +118,44 @@ SET(MISSION_CPUNAMES cpu1)
 
 SET(cpu1_PROCESSORID 1)
 #SET(cpu1_APPLIST ci_lab to_lab sch_lab)
-#SET(cpu1_STATIC_APPLIST ci_lab to_lab sch_lab)
-#SET(cpu1_STATIC_APPLIST mxm_app huff_app bench_lib to_con sch_lab)
-#SET(cpu1_STATIC_APPLIST sch_lab)
-SET(cpu1_STATIC_APPLIST mxm_app huff_app bench_lib to_con sch_lab)
+SET(cpu1_STATIC_APPLIST to_con sch_lab)
+list(APPEND cpu1_STATIC_APPLIST bench_lib)
+list(APPEND cpu1_STATIC_APPLIST mxm_app)
+list(APPEND cpu1_STATIC_APPLIST huff_app)
+
+#if (ENABLE_UNIT_TESTS)
+#    set(OSAL_CONFIG_DEBUG_PERMISSIVE_MODE TRUE)
+#    set(OSAL_CONFIG_DEBUG_PRINTF TRUE)
+#    list(APPEND cpu1_STATIC_APPLIST cfe_testcase)
+#endif (ENABLE_UNIT_TESTS)
+
 #m7cpu_STATIC_APPLIST
 #SET(cpu1_FILELIST cfe_es_startup.scr)
 list(APPEND cpu1_EMBED_FILELIST
     "STARTUP_SCR,cfe_es_startup.scr"
 )
 
+# See *_mission_cfg.h for CFE_MISSION_EVS_MAX_MESSAGE_LENGTH
+# See *.cmake for OSAL_CONFIG_MAX_API_NAME a.k.a. OS_MAX_API_NAME
+# Print buffer must have room for (CFE_MISSION_EVS_MAX_MESSAGE_LENGTH + OS_MAX_API_NAME + 30)
+# The constant 30, above, seems to be CFE_TIME_PRINTED_STRING_SIZE + spacecaft + event + separators
+#    e.g: 1980-012-14:05:30.00000 66/1/
+
+set(OSAL_CONFIG_PRINTF_BUFFER_SIZE      250
+    CACHE STRING "Maximum Length of single printf message"
+)
+
+# As far as console is async (see OSAL_CONFIG_CONSOLE_ASYNC), we
+# do not need a large print backlog.
+set(OSAL_CONFIG_PRINTF_BUFFER_DEPTH     500
+    CACHE STRING "Maximum Number of printf messages to buffer"
+)
+
+set(OSAL_CONFIG_CONSOLE_ASYNC                   FALSE
+    CACHE BOOL "Controls spawning of a separate utility task for OS_printf"
+)
+
+set(OSAL_CONFIG_PRINTF_CONSOLE_NAME "C:")
 
 #set(TGT1_STATIC_SYMLIST SAMPLE_AppMain,SAMPLE_APP)
 #  <cpuname>_STATIC_SYMLIST : list of symbols to include in the OSAL static
@@ -135,7 +163,7 @@ list(APPEND cpu1_EMBED_FILELIST
 #       the symbol name and virtual module/app name, such as
 #           My_C_Function_Name,MY_APP
 list(APPEND cpu1_STATIC_SYMLIST
-    #CFE_Assert_LibInit,ASSERT_LIB
+    CFE_Assert_LibInit,ASSERT_LIB
     BENCH_LIB_Init,BENCH_LIB
     MXM_APP_Main,MXM_APP
     HUFF_APP_Main,HUFF_APP
@@ -159,3 +187,5 @@ SET(cpu1_SYSTEM i686-linux-gnu)
 #SET(cpu1_PSP_MODULELIST
 #    soft_timebase
 #)
+
+

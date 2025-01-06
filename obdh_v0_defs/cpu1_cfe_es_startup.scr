@@ -1,10 +1,17 @@
-CFE_LIB, bench_lib,   BENCH_LIB_Init,     BENCH_LIB,     0,   0,     0x0, 0;
-CFE_APP, huff_app,    HUFF_APP_Main,      HUFF_APP,     50,   2048,  0x0, 0;
-CFE_APP, mxm_app,     MXM_APP_Main,       MXM_APP,      50,   2048,  0x0, 0;
-CFE_APP, to_tart,     TO_CON_AppMain,    TO_CON_APP,  70,   2048,  0x0, 0;
-CFE_APP, sch_lab,     SCH_LAB_AppMain,    SCH_LAB_APP,  80,   2048,  0x0, 0;
+CFE_LIB,      bench_lib,    BENCH_LIB_Init,     BENCH_LIB,     0,     0,  0x0, 0;
+CFE_APP,      mxm_app,      MXM_APP_Main,       MXM_APP,      50,  3072,  0x0, 0;
+CFE_APP,      huff_app,     HUFF_APP_Main,      HUFF_APP,     50,  3072,  0x0, 0;
+CFE_APP,      to_app,       TO_CON_AppMain,     TO_CON_APP,   70,  3072,  0x0, 0;
+CFE_APP,      sch_lab,      SCH_LAB_AppMain,    SCH_LAB_APP,  80,  2048,  0x0, 0;
 !
-!CFE_LIB, cfe_assertxx,  CFE_Assert_LibInitxx, ASSERT_LIBxx,    0,   0,     0x0, 0;
+! MXM and HUFF bench in 64 bits RISC-V would require a bit more stack to 
+! stay below 50% watermark. With 4 KiB it uses 63%.
+! We are leaving as 4 KiB as it seems stable.
+! The same occurs for TO, which uses 65% of the 4 KiB stack in 64 bits RISC-V.
+!
+!
+!CFE_LIB,      cfe_assert,   CFE_Assert_LibInit, ASSERT_LIB,    0,      0,  0x0, 0;
+!CFE_TEST_APP, cfe_testcase, CFE_TestMain,       CFE_ES,       50,   2048,  0x0, 0;
 !CFE_LIB, sample_lib,  SAMPLE_LIB_Init,    SAMPLE_LIB,    0,   0,     0x0, 0;
 !CFE_APP, sample_app,  SAMPLE_APP_Main,    SAMPLE_APP,   50,   2048,  0x0, 0;
 !CFE_APP, ci_lab,      CI_LAB_AppMain,     CI_LAB_APP,   60,   2048,  0x0, 0;

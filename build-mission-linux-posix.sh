@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# script 2>&1 | tee output.txt
-
 # Make file variables:
 
 MAKEFILE=Makefile
@@ -9,7 +7,7 @@ MISSIONCONFIG="obdh_v0"
 
 #JOBS="-j 6"
 JOBS=""
-SIMULATION="nucleo-f767-freertos"
+SIMULATION="i686-linux-gnu"
 
 # Set Make verbose
 export VERBOSE=1
@@ -192,6 +190,19 @@ if false; then
     fi
 fi
 
+# fs can crash on setschedparam() inside OS_Posix_TaskAPI_Impl_Init()
+# may need to run as root/sudo or tweak /etc/security/limits.conf, e.g. 
+#fabiob           hard    rtprio          99
+#fabiob           hard    priority        99
+#fabiob           soft    rtprio          99
+#fabiob           soft    priority        99
+#$ ulimit -Ha
+#$ ulimit -Sa
+
+# fs can crash in OS_QueueCreate(), possibly due to queue size 
+# exceeding /proc/sys/fs/mqueue/msg_max
+# may need to tweak /etc/sysctl.conf
+# fs.mqueue.msg_max = 100
 
 if false; then
 

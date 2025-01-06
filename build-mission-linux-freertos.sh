@@ -1,12 +1,32 @@
 #!/bin/bash
 
+# script 2>&1 | tee output.txt
+
 # Make file variables:
 
 MAKEFILE=Makefile
 MISSIONCONFIG="obdh_v0"
 
-JOBS="-j 6"
+#JOBS="-j 6"
+JOBS=""
 SIMULATION="i386-freertos-linux"
+
+# fs can crash on setschedparam() inside OS_Posix_TaskAPI_Impl_Init()
+# may need to run as root/sudo or tweak /etc/security/limits.conf, e.g. 
+#fabiob           hard    rtprio          99
+#fabiob           hard    priority        99
+#fabiob           soft    rtprio          99
+#fabiob           soft    priority        99
+#$ ulimit -Ha
+#$ ulimit -Sa
+
+# fs can crash in OS_QueueCreate(), possibly due to queue size 
+# exceeding /proc/sys/fs/mqueue/msg_max
+# may need to tweak /etc/sysctl.conf
+# fs.mqueue.msg_max = 100
+
+# Set Make verbose
+export VERBOSE=1
 
 # ``SIMULATION``: If set, this will override the architecture(s) specified 
 # in the targets file.
@@ -17,10 +37,29 @@ OUTDIR=build_${MISSIONCONFIG}_${SIMULATION} # defaults to 'build'
 #INSTALLPREFIX defaults to ${DESTDIR}/exe
 #BUILDTYPE defaults to "debug"
 #ARCH defaults to 'native/default_cpu1'
-BUILDTYPE=release
 
-export HOSTNAME="inf.ufrgs.br"
-export USER="fbenevenuti"
+# CMake valid build types are: Debug, Release, RelWithDebInfo and MinSizeRel
+# See ...defs/toolchain-${SIMULATION}.cmake for occasional overrides on CMAKE_FLAGS_*
+BUILDTYPE=Debug
+
+export ENABLE_UNIT_TESTS=0
+
+CLEANREBUILD=0
+
+if [ $# -gt 1 ]; then
+    echo "Use: $0 [clean]"
+    exit -1
+elif [ $# -eq 1 ]; then
+    if [ "$1" == "clean" ]; then
+        CLEANREBUILD=1
+    else
+        echo "Use: $0 [clean]"
+        exit -1
+    fi
+fi
+
+export HOSTNAME=$(hostname -f)
+export USER=$(whoami)
 
 #GCC_ROOT=/media/fabiob/portdev/toolchain_pc/gcc-12.2.0-multilib
 #LD_LIBRARY_PATH=${GCC_PATH}/
@@ -94,9 +133,12 @@ echo "${THIS_SCRIPT}:RUNNING $THIS_SCRIPT_FULLNAME"
 
 cd ${ROOT_DIR}
 
+if [ ! -d ${ROOT_DIR}/${OUTDIR} ]; then
+    CLEANREBUILD=1
+fi
 
 
-if true; then
+if [ $CLEANREBUILD == 1 ]; then
     #mkdir -p ${ROOT_DIR}/${OUTDIR}
     #cd ${ROOT_DIR}/${OUTDIR}
     rm -rf ${ROOT_DIR}/${OUTDIR}
@@ -164,19 +206,6 @@ if false; then
     fi
 fi
 
-# fs can crash on setschedparam() inside OS_Posix_TaskAPI_Impl_Init()
-# may need to run as root/sudo or tweak /etc/security/limits.conf, e.g. 
-#fabiob           hard    rtprio          99
-#fabiob           hard    priority        99
-#fabiob           soft    rtprio          99
-#fabiob           soft    priority        99
-#$ ulimit -Ha
-#$ ulimit -Sa
-
-# fs can crash in OS_QueueCreate(), possibly due to queue size 
-# exceeding /proc/sys/fs/mqueue/msg_max
-# may need to tweak /etc/sysctl.conf
-# fs.mqueue.msg_max = 100
 
 if false; then
 

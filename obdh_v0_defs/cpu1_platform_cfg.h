@@ -43,12 +43,12 @@
 #ifndef CPU1_PLATFORM_CFG_H
 #define CPU1_PLATFORM_CFG_H
 
-#if defined(__x86_64__)
-#error Unsupported/Untested target platform
-#elif (defined(__i386__) && defined(__linux__))
-#include <limits.h>
+#if ((defined(__i386__)||defined(__x86_64__)) && defined(__linux__))
+#include <limits.h> // for pthreads stack size
 #elif (defined(__arm__) && !defined(__linux__))
 //pass
+#elif (defined(__riscv))
+// pass
 #else
 #error Unknown target platform
 #endif
@@ -128,7 +128,12 @@
 **       is always a good idea to verify that no more than 1/2 of the stack is used.
 */
 //#define CFE_PLATFORM_ES_START_TASK_STACK_SIZE CFE_PLATFORM_ES_DEFAULT_STACK_SIZE
-#define CFE_PLATFORM_ES_START_TASK_STACK_SIZE MAX_CONSTANT(2048,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#if (defined(__riscv) && (__riscv_xlen == 64) && !defined(__linux__))
+// ES in RV64 requires a bit more stack to stay near 1/2 watermark
+#define CFE_PLATFORM_ES_START_TASK_STACK_SIZE MAX_CONSTANT(6*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#else
+#define CFE_PLATFORM_ES_START_TASK_STACK_SIZE MAX_CONSTANT(3*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#endif
 
 /**
 **  \cfeescfg Default virtual path for persistent storage
@@ -141,7 +146,7 @@
 **
 */
 //#define CFE_PLATFORM_ES_NONVOL_DISK_MOUNT_STRING "/cf"
-#define CFE_PLATFORM_ES_NONVOL_DISK_MOUNT_STRING "/ram"
+#define CFE_PLATFORM_ES_NONVOL_DISK_MOUNT_STRING "/cf"
 
 /**
 **  \cfeescfg Default virtual path for volatile storage
@@ -231,7 +236,7 @@
 **       verified.
 */
 //#define CFE_PLATFORM_ES_SYSTEM_LOG_SIZE 3072
-#define CFE_PLATFORM_ES_SYSTEM_LOG_SIZE 512
+#define CFE_PLATFORM_ES_SYSTEM_LOG_SIZE 1024 // 512
 
 /**
 **  \cfeescfg Define Number of entries in the ES Object table
@@ -322,7 +327,7 @@
 **       however, the maximum RAM disk sector size is system dependent and should be
 **       verified.
 */
-#define CFE_PLATFORM_ES_RAM_DISK_SECTOR_SIZE 512
+#define CFE_PLATFORM_ES_RAM_DISK_SECTOR_SIZE 128 //512 for FAT, 128 for MFS
 
 /**
 **  \cfeescfg ES Ram Disk Number of Sectors
@@ -384,7 +389,7 @@
 **       on this configuration parameter.
 */
 //#define CFE_PLATFORM_ES_CDS_SIZE (128 * 1024)
-#define CFE_PLATFORM_ES_CDS_SIZE ( 8 * 1024 ) // see also CFE_PLATFORM_ES_CDS_MAX_NUM_ENTRIES
+#define CFE_PLATFORM_ES_CDS_SIZE ( 12 * 1024 ) // see also CFE_PLATFORM_ES_CDS_MAX_NUM_ENTRIES
 
 /**
 **  \cfeescfg Define User Reserved Memory Size
@@ -424,7 +429,7 @@
 **  \par Limits
 **       This must always be a power of 2, as it is used as a binary address mask.
 */
-#define CFE_PLATFORM_ES_MEMPOOL_ALIGN_SIZE_MIN 4
+#define CFE_PLATFORM_ES_MEMPOOL_ALIGN_SIZE_MIN 8 // 4
 
 /**
 **  \cfeescfg ES Nonvolatile Startup Filename
@@ -439,7 +444,7 @@
 **       #OS_MAX_PATH_LEN value.
 */
 //#define CFE_PLATFORM_ES_NONVOL_STARTUP_FILE "/cf/cfe_es_startup.scr"
-#define CFE_PLATFORM_ES_NONVOL_STARTUP_FILE "/ram/cfestrup.scr"
+#define CFE_PLATFORM_ES_NONVOL_STARTUP_FILE "/cf/cfestrup.scr"
 
 /**
 **  \cfeescfg ES Volatile Startup Filename
@@ -596,7 +601,7 @@
 **       by a 64 bit time stamp.
 */
 //#define CFE_PLATFORM_ES_PERF_DATA_BUFFER_SIZE 10000
-#define CFE_PLATFORM_ES_PERF_DATA_BUFFER_SIZE 1025
+#define CFE_PLATFORM_ES_PERF_DATA_BUFFER_SIZE 2048 // 1025
 
 /**
 **  \cfeescfg Define Filter Mask Setting for Disabling All Performance Entries
@@ -690,7 +695,7 @@
 **       type is an unsigned 32-bit integer, so the valid range is 0 to 0xFFFFFFFF.
 */
 //#define CFE_PLATFORM_ES_PERF_CHILD_STACK_SIZE 4096
-#define CFE_PLATFORM_ES_PERF_CHILD_STACK_SIZE MAX_CONSTANT(4096,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#define CFE_PLATFORM_ES_PERF_CHILD_STACK_SIZE MAX_CONSTANT(2*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
 
 /**
 **  \cfeescfg Define Performance Analyzer Child Task Delay
@@ -732,14 +737,16 @@
 **       of the stack is used.
 */
 //#define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE 8192
-#if (defined(__i386__) && defined(__linux__))
+#if ( (defined(__i386__)||defined(__x86_64__)) && defined(__linux__))
 #ifdef PTHREAD_STACK_MIN
 #define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE PTHREAD_STACK_MIN /* a.k.a. PTHREAD_STACK_MIN, configMINIMAL_STACK_SIZE */
 #else
 #error Unknown pthread definitions
 #endif
 #elif (defined(__arm__) && !defined(__linux__))
-#define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE 2048
+#define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE (2*1024)
+#elif (defined(__riscv) && (__riscv_xlen == 64) && !defined(__linux__))
+#define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE MAX_CONSTANT(2*1024, 4*1024)
 #else
 #error Unknown target platform
 #endif
@@ -938,7 +945,7 @@
 **       is always a good idea to verify that no more than 1/2 of the stack is used.
 */
 //#define CFE_PLATFORM_EVS_START_TASK_STACK_SIZE CFE_PLATFORM_ES_DEFAULT_STACK_SIZE
-#define CFE_PLATFORM_EVS_START_TASK_STACK_SIZE  MAX_CONSTANT(2048,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#define CFE_PLATFORM_EVS_START_TASK_STACK_SIZE  MAX_CONSTANT(2*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
 
 /**
 **  \cfeevscfg Define Maximum Number of Event Filters per Application
@@ -1118,7 +1125,7 @@
 **       or equal to OS_MAX_QUEUES.
 **
 */
-#define CFE_PLATFORM_SB_MAX_PIPES 64
+#define CFE_PLATFORM_SB_MAX_PIPES 64 // 64
 
 /**
 **  \cfesbcfg Maximum Number of unique local destinations a single MsgId can have
@@ -1172,7 +1179,7 @@
 **
 */
 //#define CFE_PLATFORM_SB_BUF_MEMORY_BYTES 524288
-#define CFE_PLATFORM_SB_BUF_MEMORY_BYTES (32*1024)
+#define CFE_PLATFORM_SB_BUF_MEMORY_BYTES (64*1024)
 
 /**
 **  \cfesbcfg Highest Valid Message Id
@@ -1356,7 +1363,13 @@
 **       is always a good idea to verify that no more than 1/2 of the stack is used.
 */
 //#define CFE_PLATFORM_SB_START_TASK_STACK_SIZE CFE_PLATFORM_ES_DEFAULT_STACK_SIZE
-#define CFE_PLATFORM_SB_START_TASK_STACK_SIZE MAX_CONSTANT(2048,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+
+#if (defined(__riscv) && (__riscv_xlen == 64) && !defined(__linux__))
+// SB in RV64 requires a bit more stack to stay near 1/2 watermark
+#define CFE_PLATFORM_SB_START_TASK_STACK_SIZE MAX_CONSTANT(6*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#else
+#define CFE_PLATFORM_SB_START_TASK_STACK_SIZE MAX_CONSTANT(3*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#endif
 
 /***************************************************************************/
 /*
@@ -1387,7 +1400,7 @@
 **       tools for measuring the amount of stack used by a task during operation. It
 **       is always a good idea to verify that no more than 1/2 of the stack is used.
 */
-#define CFE_PLATFORM_TBL_START_TASK_STACK_SIZE CFE_PLATFORM_ES_DEFAULT_STACK_SIZE
+#define CFE_PLATFORM_TBL_START_TASK_STACK_SIZE MAX_CONSTANT(2*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
 
 /* Platform Configuration Parameters for Table Service (TBL) */
 
@@ -1404,7 +1417,7 @@
 **       The cFE does not place a limit on the size of this parameter.
 */
 //#define CFE_PLATFORM_TBL_BUF_MEMORY_BYTES 524288
-#define CFE_PLATFORM_TBL_BUF_MEMORY_BYTES (32*1024)//(32*1024)
+#define CFE_PLATFORM_TBL_BUF_MEMORY_BYTES (64*1024)//(32*1024)
 /**
 **  \cfetblcfg Maximum Size Allowed for a Double Buffered Table
 **
@@ -1416,7 +1429,7 @@
 **       less than half of #CFE_PLATFORM_TBL_BUF_MEMORY_BYTES.
 */
 //#define CFE_PLATFORM_TBL_MAX_DBL_TABLE_SIZE 16384
-#define CFE_PLATFORM_TBL_MAX_DBL_TABLE_SIZE (5*512) //(2*1024)
+#define CFE_PLATFORM_TBL_MAX_DBL_TABLE_SIZE (5*1024) //(2*1024)
 
 /**
 **  \cfetblcfg Maximum Size Allowed for a Single Buffered Table
@@ -1433,7 +1446,7 @@
 **       to fit into #CFE_PLATFORM_TBL_BUF_MEMORY_BYTES.
 */
 //#define CFE_PLATFORM_TBL_MAX_SNGL_TABLE_SIZE 16384
-#define CFE_PLATFORM_TBL_MAX_SNGL_TABLE_SIZE (5*512)
+#define CFE_PLATFORM_TBL_MAX_SNGL_TABLE_SIZE (5*1024)
 
 /**
 **  \cfetblcfg Maximum Number of Tables Allowed to be Registered
@@ -1720,7 +1733,7 @@
 **       to true.
 */
 #define CFE_PLATFORM_TIME_MAX_DELTA_SECS 0
-#define CFE_PLATFORM_TIME_MAX_DELTA_SUBS 500000
+#define CFE_PLATFORM_TIME_MAX_DELTA_SUBS 500000 // 500000
 
 /**
 **  \cfetimecfg Define the Local Clock Rollover Value in seconds and subseconds
@@ -1747,19 +1760,19 @@
 **  \par Limits
 **       Not Applicable
 */
-#define CFE_PLATFORM_TIME_CFG_TONE_LIMIT 20000
+#define CFE_PLATFORM_TIME_CFG_TONE_LIMIT 20000 // 20000
 
 /**
 **  \cfetimecfg Define Time to Start Flywheel Since Last Tone
 **
 **  \par Description:
 **       Define time to enter flywheel mode (in seconds since last tone data update)
-**       Units are microseconds as measured with the local clock.
+**       Units are seconds as measured with the local clock.
 **
 **  \par Limits
 **       Not Applicable
 */
-#define CFE_PLATFORM_TIME_CFG_START_FLY 2
+#define CFE_PLATFORM_TIME_CFG_START_FLY 2 // __UINT32_MAX__ 2
 
 /**
 **  \cfetimecfg Define Periodic Time to Update Local Clock Tone Latch
@@ -1772,7 +1785,7 @@
 **  \par Limits
 **       Not Applicable
 */
-#define CFE_PLATFORM_TIME_CFG_LATCH_FLY 8
+#define CFE_PLATFORM_TIME_CFG_LATCH_FLY 8 // __UINT32_MAX__ 8
 
 /**
 **  \cfetimecfg Define TIME Task Priorities
@@ -1810,15 +1823,17 @@
 //#define CFE_PLATFORM_TIME_TONE_TASK_STACK_SIZE  4096
 //#define CFE_PLATFORM_TIME_ONEHZ_TASK_STACK_SIZE 8192
 
-#define CFE_PLATFORM_TIME_START_TASK_STACK_SIZE            MAX_CONSTANT(2048,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
-#define CFE_PLATFORM_TIME_TONE_TASK_STACK_SIZE             MAX_CONSTANT(2048,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
-#define CFE_PLATFORM_TIME_ONEHZ_TASK_STACK_SIZE            MAX_CONSTANT(2048,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#define CFE_PLATFORM_TIME_START_TASK_STACK_SIZE            MAX_CONSTANT(2*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#define CFE_PLATFORM_TIME_TONE_TASK_STACK_SIZE             MAX_CONSTANT(2*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#define CFE_PLATFORM_TIME_ONEHZ_TASK_STACK_SIZE            MAX_CONSTANT(2*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
 
 
-#if (defined(__i386__) && defined(__linux__))
+#if ((defined(__i386__)||defined(__x86_64__)) && defined(__linux__))
 #define CFE_PSP_RESERVED_MEMORY_SIZE (4 *1024 * 1024)
 #elif (defined(__arm__) && !defined(__linux__))
-#define CFE_PSP_RESERVED_MEMORY_SIZE (90 * 1024) // 107
+#define CFE_PSP_RESERVED_MEMORY_SIZE (60 * 1024)
+#elif (defined(__riscv) && (__riscv_xlen == 64))
+#define CFE_PSP_RESERVED_MEMORY_SIZE (60 * 1024) // 60 KiB for MFS RAMDISK, 110 KiB for FAT RAMDISK
 #else
 #error Unknown target platform
 #endif

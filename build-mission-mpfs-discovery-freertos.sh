@@ -9,7 +9,7 @@ MISSIONCONFIG="obdh_v0"
 
 #JOBS="-j 6"
 JOBS=""
-SIMULATION="nucleo-f767-freertos"
+SIMULATION="mpfs-discovery-freertos"
 
 # Set Make verbose
 export VERBOSE=1
