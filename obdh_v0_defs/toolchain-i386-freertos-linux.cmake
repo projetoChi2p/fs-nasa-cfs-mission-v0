@@ -81,8 +81,8 @@ GET_FILENAME_COMPONENT(PSP_SOURCE_DIR      "${TOP_PROJECT_DIR}/psp"         REAL
 GET_FILENAME_COMPONENT(CFE_SOURCE_DIR      "${TOP_PROJECT_DIR}/cfe"         REALPATH )
 
 
-set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1/include")
-set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1")
+set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1-v202212.01-gcc-posix/include")
+set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1-v202212.01-gcc-posix")
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
     set(OSAL_XILINX_MFS_SRC_DIR        "${THIRDPARTY_DIR}/xilinx-xilmfs-v2.3+")
