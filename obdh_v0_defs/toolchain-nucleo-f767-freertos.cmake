@@ -26,17 +26,10 @@ set(CMAKE_C_COMPILER_WORKS 1)
 set(CMAKE_CXX_COMPILER_WORKS 1)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 set(CMAKE_CROSSCOMPILING 1)
 
-#[[
-add_compile_options(
-    -Werror                     # Treat warnings as errors (code should be clean)
-    -std=c99                    # Target the C99 standard (without gcc extensions)
-)
-]]
 
 add_compile_options(
     -Wfatal-errors              # Stop on first compilation error
@@ -222,8 +215,8 @@ message("+++ CMAKE_CURRENT_BINARY_DIR '${CMAKE_CURRENT_BINARY_DIR}'.")
 # have no mapping in osconfig.h.in
 add_definitions(-DOS_TIMEBASE_TASK_STACK_SIZE=1024) # OSAL semantics, size in bytes
 add_definitions(-DOS_TIMEBASE_TASK_PRIORITY=25)     # OSAL semantics, lower value is lower priority
-add_definitions(-DPSP_CFE_TASK_STACK_SIZE_BYTES=2048)
-add_definitions(-DPSP_CFE_TASK_PRIORITY=150)
+add_definitions(-DBSP_MAIN_TASK_STACK_SIZE_BYTES=2048)
+add_definitions(-DBSP_MAIN_TASK_PRIORITY=150)
 add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=128)
 add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
 add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
