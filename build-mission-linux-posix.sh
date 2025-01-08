@@ -5,8 +5,8 @@
 MAKEFILE=Makefile
 MISSIONCONFIG="obdh_v0"
 
-#JOBS="-j 6"
 JOBS=""
+#JOBS="-j 6"
 SIMULATION="i686-linux-gnu"
 
 # Set Make verbose

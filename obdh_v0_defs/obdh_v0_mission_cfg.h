@@ -294,7 +294,7 @@
 **  \par Limits
 **      Not Applicable
 */
-#define CFE_MISSION_EVS_MAX_MESSAGE_LENGTH 200 // 122
+#define CFE_MISSION_EVS_MAX_MESSAGE_LENGTH 150
 
 /******************************************************************************
  *   CFE File Services (CFE_FS) Public Definitions

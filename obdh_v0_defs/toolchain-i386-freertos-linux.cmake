@@ -30,11 +30,6 @@ set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR i386)
 set(CMAKE_CROSSCOMPILING 1)
 
-#[[
-add_compile_options(
-    -Werror                     # Treat warnings as errors (code should be clean)
-)
-]]
 
 add_compile_options(
     -Wfatal-errors              # Stop on first compilation error
@@ -189,8 +184,8 @@ message("+++ CMAKE_CURRENT_BINARY_DIR '${CMAKE_CURRENT_BINARY_DIR}'.")
 # have no mapping in osconfig.h.in
 add_definitions(-DOS_TIMEBASE_TASK_STACK_SIZE=2048) # OSAL semantics, size in bytes
 add_definitions(-DOS_TIMEBASE_TASK_PRIORITY=25)     # OSAL semantics, lower value is lower priority
-add_definitions(-DPSP_CFE_TASK_STACK_SIZE_BYTES=4096)
-add_definitions(-DPSP_CFE_TASK_PRIORITY=150)
+add_definitions(-DBSP_MAIN_TASK_STACK_SIZE_BYTES=4096)
+add_definitions(-DBSP_MAIN_TASK_PRIORITY=150)
 add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=128)
 add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
 add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage

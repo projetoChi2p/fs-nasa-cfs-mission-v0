@@ -141,13 +141,13 @@ list(APPEND cpu1_EMBED_FILELIST
 # The constant 30, above, seems to be CFE_TIME_PRINTED_STRING_SIZE + spacecaft + event + separators
 #    e.g: 1980-012-14:05:30.00000 66/1/
 
-set(OSAL_CONFIG_PRINTF_BUFFER_SIZE      250
+set(OSAL_CONFIG_PRINTF_BUFFER_SIZE    200   # 150+20+30
     CACHE STRING "Maximum Length of single printf message"
 )
 
 # As far as console is async (see OSAL_CONFIG_CONSOLE_ASYNC), we
 # do not need a large print backlog.
-set(OSAL_CONFIG_PRINTF_BUFFER_DEPTH     500
+set(OSAL_CONFIG_PRINTF_BUFFER_DEPTH     50
     CACHE STRING "Maximum Number of printf messages to buffer"
 )
 

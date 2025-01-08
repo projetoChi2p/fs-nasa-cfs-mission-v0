@@ -7,8 +7,8 @@
 MAKEFILE=Makefile
 MISSIONCONFIG="obdh_v0"
 
-#JOBS="-j 6"
 JOBS=""
+#JOBS="-j 6"
 SIMULATION="nucleo-f767-freertos"
 
 # Set Make verbose

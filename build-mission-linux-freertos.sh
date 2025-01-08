@@ -7,8 +7,8 @@
 MAKEFILE=Makefile
 MISSIONCONFIG="obdh_v0"
 
-#JOBS="-j 6"
 JOBS=""
+#JOBS="-j 6"
 SIMULATION="i386-freertos-linux"
 
 # fs can crash on setschedparam() inside OS_Posix_TaskAPI_Impl_Init()

@@ -7,8 +7,8 @@
 MAKEFILE=Makefile
 MISSIONCONFIG="obdh_v0"
 
-#JOBS="-j 6"
 JOBS=""
+JOBS="-j 10"
 SIMULATION="mpfs-discovery-freertos"
 
 # Set Make verbose
