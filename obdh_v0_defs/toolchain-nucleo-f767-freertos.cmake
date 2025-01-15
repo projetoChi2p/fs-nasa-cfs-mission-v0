@@ -218,9 +218,10 @@ add_definitions(-DOS_TIMEBASE_TASK_PRIORITY=25)     # OSAL semantics, lower valu
 add_definitions(-DBSP_MAIN_TASK_STACK_SIZE_BYTES=2048)
 add_definitions(-DBSP_MAIN_TASK_PRIORITY=150)
 add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=128)
-add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
-add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
+#add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
+#add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
 add_definitions(-DOS_ASSERT_USE_TASK_NAME=1)      # Use OSAL task name inspection during assertions.
+add_definitions(-DFREERTOS_TRACE_ENABLED=1)     
 
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)

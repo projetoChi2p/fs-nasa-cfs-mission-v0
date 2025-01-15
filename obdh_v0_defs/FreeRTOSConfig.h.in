@@ -37,6 +37,13 @@
 
 #if (defined(__arm__) && !defined(__linux__) && defined(__GNUC__))
 
+
+#if defined(FREERTOS_TRACE_ENABLED)
+  #define configUSE_APPLICATION_TASK_TAG 1
+  #define traceTASK_SWITCHED_IN()   HLP_vPrintChar((char) xTaskGetApplicationTaskTagFromISR(xTaskGetCurrentTaskHandle()),0)
+  #define traceTASK_SWITCHED_OUT()  HLP_vPrintChar((char) (xTaskGetApplicationTaskTagFromISR(xTaskGetCurrentTaskHandle())),32)
+
+#endif
 // http://patorjk.com/software/taag/#f=Colossal
 //        d8888 8888888b.  888b     d888        .d8888b.                   888                            888b     d888       
 //       d88888 888   Y88b 8888b   d8888       d88P  Y88b                  888                            8888b   d8888       
