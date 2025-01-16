@@ -82,6 +82,12 @@ uint32_t HLP_ulSystemGetPerfCounter( void );
 #define xPortSysTickHandler                             SysTick_Handler
 
 
+extern char trace_task_name_in [16];
+extern char trace_task_name_out [16];
+
+#define traceTASK_SWITCHED_IN()  strncpy(trace_task_name_in, pcTaskGetName(xTaskGetCurrentTaskHandle()), 16)
+#define traceTASK_SWITCHED_OUT() strncpy(trace_task_name_out, pcTaskGetName(xTaskGetCurrentTaskHandle()), 16)
+
 #elif (defined(__i386__) && defined(__linux__) && defined(__GNUC__))
 
 // http://patorjk.com/software/taag/#f=Colossal
@@ -229,6 +235,13 @@ uint32_t HLP_ulSystemGetPerfCounter( void );
 #define configUSE_QUEUE_SETS                    1
 // Default is 1
 #define configTASK_NOTIFICATION_ARRAY_ENTRIES   3
+
+
+extern char trace_task_name_in [16];
+extern char trace_task_name_out [16];
+
+#define traceTASK_SWITCHED_IN()  strncpy(trace_task_name_in, pcTaskGetName(xTaskGetCurrentTaskHandle()), 16)
+#define traceTASK_SWITCHED_OUT() strncpy(trace_task_name_out, pcTaskGetName(xTaskGetCurrentTaskHandle()), 16)
 
 #else
 
