@@ -36,6 +36,9 @@ add_compile_options(
 )
 
 add_definitions(-DMPFS_DISCOVERY_KIT)
+add_definitions(-DFREERTOS_TRACE_ENABLED)
+add_definitions(-DENABLE_FI)
+
 set(MPFS_HARDWARE_DESIGN "mpfs-discovery-kit-design_v0.2")
 set(OSAL_RAMDISK_FILESYSTEM_IS_MFS True)
 set(CMAKE_VERBOSE_MAKEFILE true)
@@ -226,7 +229,7 @@ if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
 endif()
 
 # These FreeRTOS configurations are applied to FreeRTOSConfig.h.in
-set (FREERTOS_PLATFORM_STACK_MIN_WORDS        128)
+set (FREERTOS_PLATFORM_STACK_MIN_WORDS        256)
 math(EXPR FREERTOS_PLATFORM_HEAP_SIZE_BYTES "80 * 1024")
 
 
