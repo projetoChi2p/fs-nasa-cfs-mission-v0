@@ -91,6 +91,3 @@ ${GDB_EXEC} --batch --command=${THIS_SCRIPT_FULLNAME}.gdb.tmp
 /usr/bin/expect ${THIS_SCRIPT_FULLNAME}.expect.tmp
 
 exit 0
-
-
-# /home/luis/Microchip/SoftConsole-v2022.2-RISC-V-747/openocd/bin/openocd --search /home/luis/Microchip/SoftConsole-v2022.2-RISC-V-747/openocd/share/openocd/scripts/ --command "set DEVICE MPFS" --file board/microsemi-riscv.cfg --command "init; reset halt; sleep 200"
