@@ -152,7 +152,7 @@ set(CMAKE_ASM_FLAGS_DEBUG          "-g3 -ggdb -O0 -DDEBUG"     CACHE STRING "Ove
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 add_compile_options(-march=rv64imac)                       # When using newer GCC, may require "rv64ima_zicsr_zifencei"
-add_compile_options(-mabi=lp64 )
+add_compile_options(-mabi=lp64)
 add_compile_options(-msmall-data-limit=8)
 add_compile_options(-mcmodel=medany)                      # Memory model: how sparse memory addresses can be
 add_compile_options(-mstrict-align)                       # Memory access alignment
@@ -164,8 +164,8 @@ add_compile_options(-ffunction-sections -fdata-sections)  # Place functions and 
 add_compile_options(-frecord-gcc-switches)                # Keep track of compilation inside object files
 
 
-add_link_options(-march=rv64gc)                         # When using newer GCC, may require "rv64ima_zicsr_zifencei"
-add_link_options(-mabi=lp64d )
+add_link_options(-march=rv64imac)                         # When using newer GCC, may require "rv64ima_zicsr_zifencei"
+add_link_options(-mabi=lp64)
 add_link_options(-mcmodel=medany)                        # When using DDR, may require -mcmodel=medany
 add_link_options(-T ${LINKER_SCRIPT})
 add_link_options(-nostartfiles -Wl,--gc-sections)
