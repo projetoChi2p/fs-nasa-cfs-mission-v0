@@ -81,7 +81,7 @@ GET_FILENAME_COMPONENT(CFE_SOURCE_DIR      "${TOP_PROJECT_DIR}/cfe"         REAL
 
 # STM32F767Zi is CPUID 0x411FC270, hence r1p0
 # See also FreeRTOS/portable/GCC/ARM_CM7/ReadMe.txt
-# First implementation tests with NUCLEO-F767Zi used FreeRTOS 8.2.3 Cortex-M7 
+# First implementation tests with NUCLEO-F767Zi used FreeRTOS 8.2.3 Cortex-M7
 # r0p1 (freertos-v8.2.3/portable/GCC/ARM_CM7/r0p1), but radiation tests
 # were performed using FreeRTOS 10.2.1 Cortex-M4F (freertos-v10.2.1-stm32cubel4/portable/GCC/ARM_CM4F)
 # See also build_all_all_cortex_m7all_stm32f767_nucleo_cmake
@@ -173,11 +173,11 @@ add_link_options(-Wl,-Map=link.map) # Note: the same map file is being used for 
 #set(CMAKE_ASM_FLAGS "${GDB_FLAGS} ${MCPU_FLAGS} -x assembler-with-cpp" CACHE INTERNAL "asm compiler flags")
 
 
- set(COMPILER_LINKER_OPTION_PREFIX "-Wl,")
- set(START_WHOLE_ARCHIVE "--whole-archive")
- set(STOP_WHOLE_ARCHIVE  "--no-whole-archive")
- set(START_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${START_WHOLE_ARCHIVE}")
- set(STOP_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${STOP_WHOLE_ARCHIVE}")
+set(COMPILER_LINKER_OPTION_PREFIX "-Wl,")
+set(START_WHOLE_ARCHIVE "--whole-archive")
+set(STOP_WHOLE_ARCHIVE  "--no-whole-archive")
+set(START_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${START_WHOLE_ARCHIVE}")
+set(STOP_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${STOP_WHOLE_ARCHIVE}")
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM   NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY   NEVER)
@@ -211,7 +211,7 @@ message("+++ OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 message("+++ CMAKE_CURRENT_BINARY_DIR '${CMAKE_CURRENT_BINARY_DIR}'.")
 
 
-# These OSAL configurations are specific to FreeRTOS and 
+# These OSAL configurations are specific to FreeRTOS and
 # have no mapping in osconfig.h.in
 add_definitions(-DOS_TIMEBASE_TASK_STACK_SIZE=1024) # OSAL semantics, size in bytes
 add_definitions(-DOS_TIMEBASE_TASK_PRIORITY=25)     # OSAL semantics, lower value is lower priority
@@ -221,7 +221,7 @@ add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=128)
 #add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
 #add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
 add_definitions(-DOS_ASSERT_USE_TASK_NAME=1)      # Use OSAL task name inspection during assertions.
-add_definitions(-DFREERTOS_TRACE_ENABLED=1)     
+add_definitions(-DFREERTOS_TRACE_ENABLED=1)
 
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)

@@ -173,6 +173,12 @@ add_link_options(-specs=nano.specs)
 add_link_options(-specs=nosys.specs)
 add_link_options(-Wl,-Map=link.map) # Note: the same map file is being used for all programs! You may need to build a single target to get the correct map.
 
+set(COMPILER_LINKER_OPTION_PREFIX "-Wl,")
+set(START_WHOLE_ARCHIVE "--whole-archive")
+set(STOP_WHOLE_ARCHIVE  "--no-whole-archive")
+set(START_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${START_WHOLE_ARCHIVE}")
+set(STOP_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${STOP_WHOLE_ARCHIVE}")
+
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM   NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY   NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE   NEVER)
