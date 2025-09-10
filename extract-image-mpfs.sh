@@ -28,8 +28,11 @@ echo "Generating .bin image..."
 echo "Generating .hex image..."
 /opt/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/riscv64-unknown-elf-objcopy -O ihex "${ELF_FILE}" "${OUTPUT_FOLDER}/image.hex"
 
+echo "Generating .srec image..."
+/opt/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/riscv64-unknown-elf-objcopy -O srec "${ELF_FILE}" "${OUTPUT_FOLDER}/image.srec"
+
 # Display results
 echo "Extraction complete. File saved in '${OUTPUT_FOLDER}':"
 echo "  ${BASENAME}.elf -> ${OUTPUT_FOLDER}/image.bin"
 echo "  ${BASENAME}.elf -> ${OUTPUT_FOLDER}/image.hex"
-
+echo "  ${BASENAME}.elf -> ${OUTPUT_FOLDER}/image.srec"
