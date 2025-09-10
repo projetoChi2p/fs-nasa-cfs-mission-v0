@@ -36,7 +36,7 @@ add_compile_options(
 )
 
 add_definitions(-DMPFS_DISCOVERY_KIT)
-add_definitions(-DFREERTOS_TRACE_ENABLED)
+# add_definitions(-DFREERTOS_TRACE_ENABLED)
 add_definitions(-DENABLE_FI)
 
 set(MPFS_HARDWARE_DESIGN "mpfs-discovery-kit-design_v0.2")
@@ -126,7 +126,13 @@ set(CFE_SYSTEM_PSPNAME      "mpfs-discovery-freertos")
 set(OSAL_SYSTEM_BSPTYPE     "mpfs-discovery-freertos")
 set(OSAL_SYSTEM_OSTYPE      "freertos")
 
-set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_hal/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release/linker/mpfs-lim.ld")
+set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release/linker/mpfs-lim.ld")
+# set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/ddr-release/linker/mpfs-ddr-loaded-by-boot-loader.ld")
+# set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/ddr-release/linker/mpfs-ddr-32bit-cached.ld")
+# set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/ddr-release/linker/mpfs-ddr-32bit-non-cached.ld")
+# set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/ddr-release/linker/mpfs-ddr-38bit-cached.ld")
+# set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/ddr-release/linker/mpfs-ddr-38bit-non-cached.ld")
+
 
 
 # CMake default are:
@@ -136,16 +142,16 @@ set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_h
 # GCC default are:
 # -O0
 
-set(CMAKE_C_FLAGS_RELEASE          "          -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
-set(CMAKE_ASM_FLAGS_RELEASE        "          -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
-set(CMAKE_C_FLAGS_RELWITHDEBINFO   "-g3 -ggdb -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
-set(CMAKE_ASM_FLAGS_RELWITHDEBINFO "-g3 -ggdb -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
-set(CMAKE_C_FLAGS_DEBUG            "-g3 -ggdb -O1 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
-set(CMAKE_ASM_FLAGS_DEBUG          "-g3 -ggdb -O1 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_C_FLAGS_RELEASE          "          -O3 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_ASM_FLAGS_RELEASE        "          -O3 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_C_FLAGS_RELWITHDEBINFO   "-g3 -ggdb -O0 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_ASM_FLAGS_RELWITHDEBINFO "-g3 -ggdb -O0 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_C_FLAGS_DEBUG            "-g3 -ggdb -O0 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_ASM_FLAGS_DEBUG          "-g3 -ggdb -O0 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
 
 
-add_compile_options(-Wall)
-add_compile_options(-march=rv64ima)                       # When using newer GCC, may require "rv64ima_zicsr_zifencei" 
+add_compile_options(-Wall -Wextra -Wpedantic)
+add_compile_options(-march=rv64imac)                       # When using newer GCC, may require "rv64ima_zicsr_zifencei"
 add_compile_options(-mabi=lp64 )
 add_compile_options(-msmall-data-limit=8)
 add_compile_options(-mcmodel=medany)                      # Memory model: how sparse memory addresses can be
@@ -158,9 +164,9 @@ add_compile_options(-ffunction-sections -fdata-sections)  # Place functions and 
 add_compile_options(-frecord-gcc-switches)                # Keep track of compilation inside object files
 
 
-add_link_options(-march=rv64ima)                         # When using newer GCC, may require "rv64ima_zicsr_zifencei" 
-add_link_options(-mabi=lp64 )
-add_link_options(-mcmodel=medlow)                        # When using DDR, may require -mcmodel=medany
+add_link_options(-march=rv64gc)                         # When using newer GCC, may require "rv64ima_zicsr_zifencei"
+add_link_options(-mabi=lp64d )
+add_link_options(-mcmodel=medany)                        # When using DDR, may require -mcmodel=medany
 add_link_options(-T ${LINKER_SCRIPT})
 add_link_options(-nostartfiles -Wl,--gc-sections)
 add_link_options(-specs=nano.specs)
@@ -185,11 +191,12 @@ include_directories(
 )
 
 include_directories(
-    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_hal/platform
-    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_hal/boards/${MPFS_HARDWARE_DESIGN}/
-    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_hal/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release
+    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/platform
+    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/
+    # ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_hal/boards/${MPFS_HARDWARE_DESIGN}/platform_config/ddr-release
+    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release
 )
-    
+
 # Include FreeRTOSConfig.h
 include_directories(${OSAL_SOURCE_DIR}/../obdh_v0_defs/)
 
@@ -205,15 +212,15 @@ message("+++ OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 message("+++ CMAKE_CURRENT_BINARY_DIR '${CMAKE_CURRENT_BINARY_DIR}'.")
 
 
-# These OSAL configurations are specific to FreeRTOS and 
+# These OSAL configurations are specific to FreeRTOS and
 # have no mapping in osconfig.h.in
 add_definitions(-DOS_TIMEBASE_TASK_STACK_SIZE=2048) # OSAL semantics, size in bytes
 add_definitions(-DOS_TIMEBASE_TASK_PRIORITY=25)     # OSAL semantics, lower value is lower priority
 add_definitions(-DBSP_MAIN_TASK_STACK_SIZE_BYTES=4096)
 add_definitions(-DBSP_MAIN_TASK_PRIORITY=150)
 add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=128)
-add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
-add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
+# add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
+# add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
 add_definitions(-DOS_ASSERT_USE_TASK_NAME=1)      # Use OSAL task name inspection during assertions.
 
 
