@@ -155,6 +155,12 @@ add_link_options(-Wl,-Map=link.map) # Note: the same map file is being used for 
 
 #set(CMAKE_ASM_FLAGS "-m32 -x assembler-with-cpp" CACHE INTERNAL "asm compiler flags")
 
+set(COMPILER_LINKER_OPTION_PREFIX "-Wl,")
+set(START_WHOLE_ARCHIVE "--whole-archive")
+set(STOP_WHOLE_ARCHIVE  "--no-whole-archive")
+set(START_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${START_WHOLE_ARCHIVE}")
+set(STOP_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${STOP_WHOLE_ARCHIVE}")
+
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM   NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY   NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE   NEVER)
@@ -180,7 +186,7 @@ message("+++ OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 message("+++ CMAKE_CURRENT_BINARY_DIR '${CMAKE_CURRENT_BINARY_DIR}'.")
 
 
-# These OSAL configurations are specific to FreeRTOS and 
+# These OSAL configurations are specific to FreeRTOS and
 # have no mapping in osconfig.h.in
 add_definitions(-DOS_TIMEBASE_TASK_STACK_SIZE=2048) # OSAL semantics, size in bytes
 add_definitions(-DOS_TIMEBASE_TASK_PRIORITY=25)     # OSAL semantics, lower value is lower priority

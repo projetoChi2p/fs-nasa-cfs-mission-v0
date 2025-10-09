@@ -37,7 +37,7 @@ add_compile_options(
 
 add_definitions(-DMPFS_DISCOVERY_KIT)
 # add_definitions(-DFREERTOS_TRACE_ENABLED)
-add_definitions(-DENABLE_FI)
+# add_definitions(-DENABLE_FI)
 
 set(MPFS_HARDWARE_DESIGN "mpfs-discovery-kit-design_v0.2")
 set(OSAL_RAMDISK_FILESYSTEM_IS_MFS True)
@@ -188,6 +188,7 @@ include_directories(${PSP_SOURCE_DIR}/fsw/shared-freertos/inc)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/src)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/vendor)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor)
+include_directories(${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/middleware)
 
 # FreeRTOS BSP vendored code
 include_directories(
@@ -199,7 +200,7 @@ include_directories(
 include_directories(
     ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/platform
     ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/
-    # ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_hal/boards/${MPFS_HARDWARE_DESIGN}/platform_config/ddr-release
+    # ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/ddr-release
     ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release
 )
 

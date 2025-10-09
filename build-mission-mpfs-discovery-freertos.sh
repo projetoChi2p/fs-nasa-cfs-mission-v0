@@ -8,13 +8,13 @@ MAKEFILE=Makefile
 MISSIONCONFIG="obdh_v0"
 
 JOBS=""
-JOBS="-j 10"
+# JOBS="-j 10"
 SIMULATION="mpfs-discovery-freertos"
 
 # Set Make verbose
-export VERBOSE=1
+# export VERBOSE=0
 
-# ``SIMULATION``: If set, this will override the architecture(s) specified 
+# ``SIMULATION``: If set, this will override the architecture(s) specified
 # in the targets file.
 
 OUTDIR=build_${MISSIONCONFIG}_${SIMULATION} # defaults to 'build'
@@ -26,7 +26,8 @@ OUTDIR=build_${MISSIONCONFIG}_${SIMULATION} # defaults to 'build'
 
 # CMake valid build types are: Debug, Release, RelWithDebInfo and MinSizeRel
 # See ...defs/toolchain-${SIMULATION}.cmake for occasional overrides on CMAKE_FLAGS_*
-BUILDTYPE=Debug
+# BUILDTYPE=Debug
+BUILDTYPE=Release
 
 export ENABLE_UNIT_TESTS=0
 
@@ -76,7 +77,7 @@ fi
 # name, e.g. 'arm-cortexa8_neon-linux-gnueabi', a different set of
 # cFS modules and apps can be built and deployed to be integrated
 # over the bus network
-# These node can be homogeneous or heretogeneous cores on a single or 
+# These node can be homogeneous or heretogeneous cores on a single or
 # on different SoCs.
 
 # Make/CMake build will iterate over host and all other target CPUs
@@ -95,7 +96,7 @@ fi
 #... MISSION_DEFS <= ${MISSION_SOURCE_DIR}/${MISSIONCONFIG}_defs
 #MISSION_DEFS can be populated from .../cfe/cmake/sample_defs
 
-# ${MISSION_DEFS}/targets.cmake                            ---> (mandatory) 
+# ${MISSION_DEFS}/targets.cmake                            ---> (mandatory)
 # ${MISSION_DEFS}/global_build_options.cmake               ---> (OPTIONAL)  global-scope build customization
 # ${MISSION_DEFS}/arch_build_custom.cmake                  ---> (OPTIONAL)  all cpus/nodes common customization
 # ${MISSION_DEFS}/arch_build_custom_${TARGETSYSTEM}.cmake  ---> (OPTIONAL)  ${TARGETSYSTEM} cpus/nodes specific customization
@@ -125,11 +126,7 @@ fi
 
 
 if [ $CLEANREBUILD == 1 ]; then
-    #mkdir -p ${ROOT_DIR}/${OUTDIR}
-    #cd ${ROOT_DIR}/${OUTDIR}
     rm -rf ${ROOT_DIR}/${OUTDIR}
-    #cd ${ROOT_DIR}
-
 
     # Run CMake to prepare target build/makefiles
     # It uses a 'Makefile' at top cFS dir which is populated form 'cfe/cmake/Makefile.sample'

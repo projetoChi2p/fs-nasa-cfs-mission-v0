@@ -12,7 +12,7 @@ JOBS=""
 SIMULATION="i386-freertos-linux"
 
 # fs can crash on setschedparam() inside OS_Posix_TaskAPI_Impl_Init()
-# may need to run as root/sudo or tweak /etc/security/limits.conf, e.g. 
+# may need to run as root/sudo or tweak /etc/security/limits.conf, e.g.
 #fabiob           hard    rtprio          99
 #fabiob           hard    priority        99
 #fabiob           soft    rtprio          99
@@ -20,7 +20,7 @@ SIMULATION="i386-freertos-linux"
 #$ ulimit -Ha
 #$ ulimit -Sa
 
-# fs can crash in OS_QueueCreate(), possibly due to queue size 
+# fs can crash in OS_QueueCreate(), possibly due to queue size
 # exceeding /proc/sys/fs/mqueue/msg_max
 # may need to tweak /etc/sysctl.conf
 # fs.mqueue.msg_max = 100
@@ -28,7 +28,7 @@ SIMULATION="i386-freertos-linux"
 # Set Make verbose
 export VERBOSE=1
 
-# ``SIMULATION``: If set, this will override the architecture(s) specified 
+# ``SIMULATION``: If set, this will override the architecture(s) specified
 # in the targets file.
 
 OUTDIR=build_${MISSIONCONFIG}_${SIMULATION} # defaults to 'build'
@@ -90,7 +90,7 @@ fi
 # name, e.g. 'arm-cortexa8_neon-linux-gnueabi', a different set of
 # cFS modules and apps can be built and deployed to be integrated
 # over the bus network
-# These node can be homogeneous or heretogeneous cores on a single or 
+# These node can be homogeneous or heretogeneous cores on a single or
 # on different SoCs.
 
 # Make/CMake build will iterate over host and all other target CPUs
@@ -109,7 +109,7 @@ fi
 #... MISSION_DEFS <= ${MISSION_SOURCE_DIR}/${MISSIONCONFIG}_defs
 #MISSION_DEFS can be populated from .../cfe/cmake/sample_defs
 
-# ${MISSION_DEFS}/targets.cmake                            ---> (mandatory) 
+# ${MISSION_DEFS}/targets.cmake                            ---> (mandatory)
 # ${MISSION_DEFS}/global_build_options.cmake               ---> (OPTIONAL)  global-scope build customization
 # ${MISSION_DEFS}/arch_build_custom.cmake                  ---> (OPTIONAL)  all cpus/nodes common customization
 # ${MISSION_DEFS}/arch_build_custom_${TARGETSYSTEM}.cmake  ---> (OPTIONAL)  ${TARGETSYSTEM} cpus/nodes specific customization
