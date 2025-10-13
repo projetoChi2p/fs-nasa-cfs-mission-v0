@@ -87,6 +87,9 @@ else()
     set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat-2024-01-25-dev")
 endif()
 
+set(OSAL_FATFS_SRC_DIR "${THIRDPARTY_DIR}/fatfs")
+set(OSAL_FATFS_INC_DIR "${THIRDPARTY_DIR}/fatfs")
+
 message("+++ Using MY_MISSION_DEFS_DIR '${MY_MISSION_DEFS_DIR}'.")
 message("+++ Using TOP_PROJECT_DIR '${TOP_PROJECT_DIR}'.")
 message("+++ Using THIRDPARTY_DIR '${THIRDPARTY_DIR}'.")
@@ -115,6 +118,11 @@ else()
         ${OSAL_FREERTOS_PLUS_FAT_SRC_DIR}/include
     )
 endif()
+
+# FatFs
+include_directories(
+    ${OSAL_FATFS_INC_DIR}
+)
 
 
 # OSAL
@@ -202,6 +210,7 @@ include_directories(
     ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/
     # ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/ddr-release
     ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release
+    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/middleware
 )
 
 # Include FreeRTOSConfig.h
