@@ -41,7 +41,7 @@ add_definitions(-DMPFS_DISCOVERY_KIT)
 
 set(MPFS_HARDWARE_DESIGN "mpfs-discovery-kit-design_v0.2")
 set(OSAL_RAMDISK_FILESYSTEM_IS_MFS True)
-set(CMAKE_VERBOSE_MAKEFILE true)
+# set(CMAKE_VERBOSE_MAKEFILE true)
 
 
 set(GCCPREFIX   "riscv64-unknown-elf-")
@@ -152,8 +152,8 @@ set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MP
 
 set(CMAKE_C_FLAGS_RELEASE          "          -O3 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
 set(CMAKE_ASM_FLAGS_RELEASE        "          -O3 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
-set(CMAKE_C_FLAGS_RELWITHDEBINFO   "-g3 -ggdb -O0 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
-set(CMAKE_ASM_FLAGS_RELWITHDEBINFO "-g3 -ggdb -O0 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_C_FLAGS_RELWITHDEBINFO   "-g3 -ggdb -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_ASM_FLAGS_RELWITHDEBINFO "-g3 -ggdb -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
 set(CMAKE_C_FLAGS_DEBUG            "-g3 -ggdb -O0 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
 set(CMAKE_ASM_FLAGS_DEBUG          "-g3 -ggdb -O0 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
 
@@ -215,13 +215,6 @@ include_directories(
 
 # Include FreeRTOSConfig.h
 include_directories(${OSAL_SOURCE_DIR}/../obdh_v0_defs/)
-
-# FBV 2024-02-28 The include_directories below is only for debugging and should removed from final build.
-include_directories(${CFE_SOURCE_DIR}/modules/es/fsw/src)
-include_directories(${CFE_SOURCE_DIR}/modules/core_private/fsw/inc)
-include_directories(${CFE_SOURCE_DIR}/modules/msg/fsw/inc)
-include_directories(${CFE_SOURCE_DIR}/modules/core_api/fsw/inc)
-
 
 message("+++ TARGETSYSTEM '${TARGETSYSTEM}'.")
 message("+++ OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
