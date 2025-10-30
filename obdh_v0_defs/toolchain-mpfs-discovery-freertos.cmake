@@ -41,6 +41,7 @@ add_definitions(-DMPFS_DISCOVERY_KIT)
 
 set(MPFS_HARDWARE_DESIGN "mpfs-discovery-kit-design_v0.2")
 set(OSAL_RAMDISK_FILESYSTEM_IS_MFS True)
+set(OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS True)
 # set(CMAKE_VERBOSE_MAKEFILE true)
 
 
@@ -119,10 +120,12 @@ else()
     )
 endif()
 
-# FatFs
-include_directories(
-    ${OSAL_FATFS_INC_DIR}
-)
+if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
+    # FatFs
+    include_directories(
+        ${OSAL_FATFS_INC_DIR}
+    )
+endif()
 
 
 # OSAL
@@ -242,6 +245,10 @@ if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
     add_definitions(-DMFS_MAX_FILENAME_LENGTH=20) # Must be >= OSAL_CONFIG_MAX_FILE_NAME
     add_definitions(-DMFS_MAX_OPEN_FILES=4)       # Must be >= OSAL_CONFIG_MAX_NUM_OPEN_FILES+OSAL_CONFIG_MAX_NUM_OPEN_DIRS
     add_definitions(-DMFS_MAX_FILESYSTEM=2)       # Must be >= OSAL_CONFIG_MAX_FILE_SYSTEMS
+endif()
+
+if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
+    add_definitions(-DOS_FILESYSTEM_NON_VOLATILE_IS_FATFS=1)
 endif()
 
 # These FreeRTOS configurations are applied to FreeRTOSConfig.h.in
