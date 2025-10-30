@@ -444,7 +444,7 @@
 **       #OS_MAX_PATH_LEN value.
 */
 //#define CFE_PLATFORM_ES_NONVOL_STARTUP_FILE "/cf/cfe_es_startup.scr"
-#define CFE_PLATFORM_ES_NONVOL_STARTUP_FILE "/cf/cpu1_c~1.scr"
+#define CFE_PLATFORM_ES_NONVOL_STARTUP_FILE "/cf/cfestrup.scr"
 
 /**
 **  \cfeescfg ES Volatile Startup Filename
