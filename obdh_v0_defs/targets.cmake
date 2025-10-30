@@ -91,9 +91,9 @@ SET(SPACECRAFT_ID 0x42)
 # Example:
 #    list(APPEND MISSION_GLOBAL_APPLIST sample_app sample_lib)
 
-# FBV UFRGS 2024-02-08 Workaround: We are build for static link, but 
+# FBV UFRGS 2024-02-08 Workaround: We are build for static link, but
 # CFE defaults some stuff as potentially dynamic.
-# 
+#
 foreach(DYN_APP ${MISSION_GLOBAL_APPLIST})
     message(WARNING "+++ Workaround: making ${DYN_APP} static.")
     list(REMOVE_ITEM MISSION_GLOBAL_APPLIST ${DYN_APP})
@@ -122,6 +122,7 @@ SET(cpu1_STATIC_APPLIST to_con sch_lab)
 list(APPEND cpu1_STATIC_APPLIST bench_lib)
 list(APPEND cpu1_STATIC_APPLIST mxm_app)
 list(APPEND cpu1_STATIC_APPLIST huff_app)
+list(APPEND cpu1_STATIC_APPLIST hs_app)
 
 #if (ENABLE_UNIT_TESTS)
 #    set(OSAL_CONFIG_DEBUG_PERMISSIVE_MODE TRUE)
@@ -132,7 +133,7 @@ list(APPEND cpu1_STATIC_APPLIST huff_app)
 #m7cpu_STATIC_APPLIST
 #SET(cpu1_FILELIST cfe_es_startup.scr)
 list(APPEND cpu1_EMBED_FILELIST
-    "STARTUP_SCR,cfe_es_startup.scr"
+    "STARTUP_SCR,cfestrup.scr"
 )
 
 # See *_mission_cfg.h for CFE_MISSION_EVS_MAX_MESSAGE_LENGTH
@@ -171,6 +172,7 @@ list(APPEND cpu1_STATIC_SYMLIST
     #TO_LAB_AppMain,TO_LAB_APP
     TO_CON_AppMain,TO_CON_APP
     SCH_LAB_AppMain,SCH_LAB_APP
+    HS_AppMain,HS_APP
 )
 
 
