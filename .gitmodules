@@ -37,3 +37,6 @@
 [submodule "third-party/fatfs"]
 	path = third-party/fatfs
 	url = https://github.com/projetoChi2p/fs-chan-fatfs.git
+[submodule "apps/hs_app"]
+	path = apps/hs_app
+	url = https://github.com/projetoChi2p/fs-nasa-cfs-hs_app.git
