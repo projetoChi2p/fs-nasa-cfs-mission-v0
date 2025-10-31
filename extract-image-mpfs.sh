@@ -1,5 +1,16 @@
 #!/bin/bash
 
+if [ -d $HOME/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc ]; then
+    MICROCHIP_TOOLS=$HOME/Microchip
+elif [ -d /home/tools/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc ]; then
+    MICROCHIP_TOOLS=/home/tools/Microchip
+elif [ -d /opt/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc ]; then
+    MICROCHIP_TOOLS=/opt/Microchip
+else
+    echo "Error: Toolchain not found."
+    exit -2
+fi
+
 # Check for input ELF file
 if [ $# -lt 1 ]; then
     echo "Usage: $0 <input.elf> [output_folder]"
@@ -21,15 +32,17 @@ rm -rf "$OUTPUT_FOLDER"
 # Create the output folder if it doesn't exist
 mkdir -p "$OUTPUT_FOLDER"
 
+SC_HOME="${MICROCHIP_TOOLS}/SoftConsole-v2022.2-RISC-V-747"
+
 
 echo "Generating .bin image..."
-/opt/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/riscv64-unknown-elf-objcopy -O binary "${ELF_FILE}" "${OUTPUT_FOLDER}/image.bin"
+${SC_HOME}/riscv-unknown-elf-gcc/bin/riscv64-unknown-elf-objcopy -O binary "${ELF_FILE}" "${OUTPUT_FOLDER}/image.mem"
 
 echo "Generating .hex image..."
-/opt/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/riscv64-unknown-elf-objcopy -O ihex "${ELF_FILE}" "${OUTPUT_FOLDER}/image.hex"
+${SC_HOME}/riscv-unknown-elf-gcc/bin/riscv64-unknown-elf-objcopy -O ihex "${ELF_FILE}" "${OUTPUT_FOLDER}/image.hex"
 
 echo "Generating .srec image..."
-/opt/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/riscv64-unknown-elf-objcopy -O srec "${ELF_FILE}" "${OUTPUT_FOLDER}/image.srec"
+${SC_HOME}/riscv-unknown-elf-gcc/bin/riscv64-unknown-elf-objcopy -O srec "${ELF_FILE}" "${OUTPUT_FOLDER}/image.srec"
 
 # Display results
 echo "Extraction complete. File saved in '${OUTPUT_FOLDER}':"
