@@ -8,7 +8,7 @@ MAKEFILE=Makefile
 MISSIONCONFIG="obdh_v0"
 
 JOBS=""
-JOBS="-j 10"
+# JOBS="-j 10"
 SIMULATION="mpfs-discovery-freertos"
 
 # Set Make verbose
@@ -26,7 +26,8 @@ OUTDIR=build_${MISSIONCONFIG}_${SIMULATION} # defaults to 'build'
 
 # CMake valid build types are: Debug, Release, RelWithDebInfo and MinSizeRel
 # See ...defs/toolchain-${SIMULATION}.cmake for occasional overrides on CMAKE_FLAGS_*
-BUILDTYPE=Debug
+# BUILDTYPE=Debug
+BUILDTYPE=Release
 
 export ENABLE_UNIT_TESTS=0
 

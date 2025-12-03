@@ -36,12 +36,13 @@ add_compile_options(
 )
 
 add_definitions(-DMPFS_DISCOVERY_KIT)
-add_definitions(-DFREERTOS_TRACE_ENABLED)
-add_definitions(-DENABLE_FI)
+# add_definitions(-DFREERTOS_TRACE_ENABLED)
+# add_definitions(-DENABLE_FI)
 
 set(MPFS_HARDWARE_DESIGN "mpfs-discovery-kit-design_v0.2")
 set(OSAL_RAMDISK_FILESYSTEM_IS_MFS True)
-set(CMAKE_VERBOSE_MAKEFILE true)
+set(CMAKE_VERBOSE_MAKEFILE false)
+set(OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS True)
 
 
 set(GCCPREFIX   "riscv64-unknown-elf-")
@@ -87,6 +88,9 @@ else()
     set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat-2024-01-25-dev")
 endif()
 
+set(OSAL_FATFS_SRC_DIR "${THIRDPARTY_DIR}/fatfs")
+set(OSAL_FATFS_INC_DIR "${THIRDPARTY_DIR}/fatfs")
+
 message("+++ Using MY_MISSION_DEFS_DIR '${MY_MISSION_DEFS_DIR}'.")
 message("+++ Using TOP_PROJECT_DIR '${TOP_PROJECT_DIR}'.")
 message("+++ Using THIRDPARTY_DIR '${THIRDPARTY_DIR}'.")
@@ -116,6 +120,13 @@ else()
     )
 endif()
 
+if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
+    # FatFs
+    include_directories(
+        ${OSAL_FATFS_INC_DIR}
+    )
+endif()
+
 
 # OSAL
 include_directories(${OSAL_SOURCE_DIR}/src/os/shared/inc)
@@ -126,7 +137,7 @@ set(CFE_SYSTEM_PSPNAME      "mpfs-discovery-freertos")
 set(OSAL_SYSTEM_BSPTYPE     "mpfs-discovery-freertos")
 set(OSAL_SYSTEM_OSTYPE      "freertos")
 
-set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_hal/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release/linker/mpfs-lim.ld")
+set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release/linker/mpfs-lim.ld")
 
 
 # CMake default are:
@@ -185,9 +196,10 @@ include_directories(
 )
 
 include_directories(
-    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_hal/platform
-    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_hal/boards/${MPFS_HARDWARE_DESIGN}/
-    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/polarfire_hal/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release
+    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/platform
+    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/
+    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release
+    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/middleware
 )
     
 # Include FreeRTOSConfig.h
@@ -212,8 +224,8 @@ add_definitions(-DOS_TIMEBASE_TASK_PRIORITY=25)     # OSAL semantics, lower valu
 add_definitions(-DBSP_MAIN_TASK_STACK_SIZE_BYTES=4096)
 add_definitions(-DBSP_MAIN_TASK_PRIORITY=150)
 add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=128)
-add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
-add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
+# add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
+# add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
 add_definitions(-DOS_ASSERT_USE_TASK_NAME=1)      # Use OSAL task name inspection during assertions.
 
 
@@ -226,6 +238,10 @@ if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
     add_definitions(-DMFS_MAX_FILENAME_LENGTH=20) # Must be >= OSAL_CONFIG_MAX_FILE_NAME
     add_definitions(-DMFS_MAX_OPEN_FILES=4)       # Must be >= OSAL_CONFIG_MAX_NUM_OPEN_FILES+OSAL_CONFIG_MAX_NUM_OPEN_DIRS
     add_definitions(-DMFS_MAX_FILESYSTEM=2)       # Must be >= OSAL_CONFIG_MAX_FILE_SYSTEMS
+endif()
+
+if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
+    add_definitions(-DOS_FILESYSTEM_NON_VOLATILE_IS_FATFS=1)
 endif()
 
 # These FreeRTOS configurations are applied to FreeRTOSConfig.h.in

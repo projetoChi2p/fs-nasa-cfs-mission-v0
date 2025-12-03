@@ -57,6 +57,7 @@
 #define MAX_CONSTANT(a,b)  (a > b ? a : b)
 #endif
 
+#include "obdh_v0_mission_cfg.h"
 
 /*******************************************************************************/
 /*

@@ -34,3 +34,6 @@
 [submodule "third-party/xilinx-xilmfs-v2.3+"]
 	path = third-party/xilinx-xilmfs-v2.3+
 	url = https://github.com/projetoChi2p/fs-xilinx-mfs.git
+[submodule "third-party/fatfs"]
+	path = third-party/fatfs
+	url = https://github.com/projetoChi2p/fs-chan-fatfs.git
