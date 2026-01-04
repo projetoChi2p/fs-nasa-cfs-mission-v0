@@ -27,21 +27,22 @@ set(CMAKE_CXX_COMPILER_WORKS 1)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_SYSTEM_PROCESSOR arm)
+set(CMAKE_SYSTEM_PROCESSOR riscv)
 set(CMAKE_CROSSCOMPILING 1)
 
 
 add_compile_options(
+    -Wall
+    -Wextra
+    -Wpedantic
+    # -Werror                     # Treat warnings as errors (code should be clean)
     -Wfatal-errors              # Stop on first compilation error
+    -Wno-error=sign-compare     # There are signed/unsigned comparisons in NASA's support code for unit tests.
+    -Wno-error=unused-variable  # Waive unused variable warning present on Microchip source code.
+    -Wno-error=unused-parameter # There are unused parameters in OSAL common code from NASA.
 )
 
-# We are reusing STM HAL for STM32
-add_definitions(-DSTM32F767xx -DUSE_HAL_DRIVER)
-add_definitions(-DHLP_MPU_SET_WRITE_THROUGH=0)
-add_definitions(-DHLP_DATA_CACHE_ENABLE=1)
-add_definitions(-DHLP_INSTRUCTION_CACHE_ENABLE=1)
-add_definitions(-DART_ACCLERATOR_ENABLE=1)
-add_definitions(-DPREFETCH_ENABLE=1)
+add_definitions(-DRISCV_NOELV -DRISCV_NOELV_GP64 -DCPU_FREQUENCY=50000000UL)
 
 # add_definitions(-DFREERTOS_TRACE_ENABLED)
 # add_definitions(-DENABLE_FI)
@@ -58,12 +59,14 @@ set(OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS        False)
 set(TO_CON_APP_USE_STATIC_TABLE  True)
 set(SCH_LAB_APP_USE_STATIC_TABLE True)
 
-set(GCCPREFIX "arm-none-eabi-")
+set(GCCPREFIX   "riscv64-unknown-elf-")
 
 find_program(CMAKE_C_COMPILER
   NAMES ${GCCPREFIX}gcc
   HINTS
-    "/opt/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi/bin/"
+    "$ENV{HOME}/riscv-gnu-toolchain-15.1.0-2025.12.27-multilib/riscv64-unknown-elf/bin/"
+    "/opt/riscv-gnu-toolchain-15.1.0-2025.12.27-multilib/bin/"
+    "/home/hot/inf/projects/toolchain_riscv/riscv-gnu-toolchain-15.1.0-2025.12.27-multilib/bin/"
   DOC "Find GNU GCC Toolchain"
   REQUIRED
 )
@@ -91,22 +94,11 @@ GET_FILENAME_COMPONENT(PSP_SOURCE_DIR      "${TOP_PROJECT_DIR}/psp"         REAL
 GET_FILENAME_COMPONENT(CFE_SOURCE_DIR      "${TOP_PROJECT_DIR}/cfe"         REALPATH )
 
 
-# STM32F767Zi is CPUID 0x411FC270, hence r1p0
-# See also FreeRTOS/portable/GCC/ARM_CM7/ReadMe.txt
-# First implementation tests with NUCLEO-F767Zi used FreeRTOS 8.2.3 Cortex-M7 
-# r0p1 (freertos-v8.2.3/portable/GCC/ARM_CM7/r0p1), but radiation tests
-# were performed using FreeRTOS 10.2.1 Cortex-M4F (freertos-v10.2.1-stm32cubel4/portable/GCC/ARM_CM4F)
-# See also build_all_all_cortex_m7all_stm32f767_nucleo_cmake
-# -mlittle-endian
-# -mthumb
-# -mcpu=cortex-m7
-# -mfloat-abi=hard -mfpu=fpv4-sp-d16
-
-set(OSAL_FREERTOS_INC_DIR "${THIRDPARTY_DIR}/freertos-v10.2.1-stm32cubel4/include")
-set(OSAL_FREERTOS_SRC_DIR "${THIRDPARTY_DIR}/freertos-v10.2.1-stm32cubel4")
+set(OSAL_FREERTOS_INC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1-gcc-riscv/include")
+set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1-gcc-riscv")
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
-    set(OSAL_XILINX_MFS_SRC_DIR "${THIRDPARTY_DIR}/xilinx-xilmfs-v2.3+")
+    set(OSAL_XILINX_MFS_SRC_DIR        "${THIRDPARTY_DIR}/xilinx-xilmfs-v2.3+")
 endif()
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_FREERTOS_PLUS_FAT)
@@ -132,7 +124,6 @@ if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
     include_directories(
         ${OSAL_XILINX_MFS_SRC_DIR}/src
     )
-
 endif()
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_FREERTOS_PLUS_FAT)
@@ -154,12 +145,13 @@ include_directories(${OSAL_SOURCE_DIR}/src/os/shared/inc)
 include_directories(${OSAL_SOURCE_DIR}/src/os/freertos/inc)
 
 
-set(CFE_SYSTEM_PSPNAME      "nucleo-f767-freertos")
-set(OSAL_SYSTEM_BSPTYPE     "nucleo-f767-freertos")
+set(CFE_SYSTEM_PSPNAME      "noelv-freertos")
+set(OSAL_SYSTEM_BSPTYPE     "noelv-freertos")
 set(OSAL_SYSTEM_OSTYPE      "freertos")
 
-set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/scripts/STM32F767ZITx_FLASH.ld")
-
+set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/scripts/link_ram_ddr.ld")
+#set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/scripts/link_xip_ddr.ld")
+#set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/scripts/link_ddr_ddr.ld")
 
 # CMake default are:
 # - Release: -O3
@@ -168,37 +160,42 @@ set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/scripts/STM
 # GCC default are:
 # -O0
 
-set(CMAKE_C_FLAGS_RELEASE          "          -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
-set(CMAKE_ASM_FLAGS_RELEASE        "          -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_C_FLAGS_RELEASE          "          -O3 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_ASM_FLAGS_RELEASE        "          -O3 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
 set(CMAKE_C_FLAGS_RELWITHDEBINFO   "-g3 -ggdb -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
 set(CMAKE_ASM_FLAGS_RELWITHDEBINFO "-g3 -ggdb -O1 -DNDEBUG"    CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
-set(CMAKE_C_FLAGS_DEBUG            "-g3 -ggdb -O1 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
-set(CMAKE_ASM_FLAGS_DEBUG          "-g3 -ggdb -O1 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_C_FLAGS_DEBUG            "-g3 -ggdb -O0 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
+set(CMAKE_ASM_FLAGS_DEBUG          "-g3 -ggdb -O0 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
 
 
 add_compile_options(-Wall)
-add_compile_options(-mcpu=cortex-m7 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16)
-add_compile_options(-fno-builtin)
-add_compile_options(-std=gnu11)
-add_compile_options(-fmessage-length=0)                              # No-wrap/Long compiler error messages
-add_compile_options(-ffunction-sections -fdata-sections)             # Place functions and data in own section
+add_compile_options(-march=rv64imafdc)                    # For integer-only/soft-float, use rv64imac/lp64"
+add_compile_options(-mabi=lp64d )
+add_compile_options(-msmall-data-limit=8)
+add_compile_options(-mcmodel=medany)                      # Memory model: how sparse memory addresses can be (medlow/medany/large)
+add_compile_options(-mstrict-align)                       # Memory access alignment
+add_compile_options(-mno-save-restore)                    # Prologue and epilogue code
+add_compile_options(-fmessage-length=0)                   # No-wrap/Long compiler error messages
+add_compile_options(-fsigned-char)                        # C/C++ char is signed
+add_compile_options(-ffunction-sections -fdata-sections)  # Place functions and data in own section
+
+add_compile_options(-frecord-gcc-switches)                # Keep track of compilation inside object files
 
 
-add_link_options(-mcpu=cortex-m7 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16)
+add_link_options(-march=rv64imafdc)                       # When using newer GCC, may require "rv64ima_zicsr_zifencei"
+add_link_options(-mabi=lp64d)
+add_link_options(-mcmodel=medany)                         # When using DDR, may require -mcmodel=medany
 add_link_options(-T ${LINKER_SCRIPT})
+add_link_options(-nostartfiles -Wl,--gc-sections)
 add_link_options(-specs=nano.specs)
 add_link_options(-specs=nosys.specs)
-add_link_options(-lc)
 add_link_options(-Wl,-Map=link.map) # Note: the same map file is being used for all programs! You may need to build a single target to get the correct map.
 
-#set(CMAKE_ASM_FLAGS "${GDB_FLAGS} ${MCPU_FLAGS} -x assembler-with-cpp" CACHE INTERNAL "asm compiler flags")
-
-
- set(COMPILER_LINKER_OPTION_PREFIX "-Wl,")
- set(START_WHOLE_ARCHIVE "--whole-archive")
- set(STOP_WHOLE_ARCHIVE  "--no-whole-archive")
- set(START_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${START_WHOLE_ARCHIVE}")
- set(STOP_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${STOP_WHOLE_ARCHIVE}")
+#set(COMPILER_LINKER_OPTION_PREFIX "-Wl,")
+#set(START_WHOLE_ARCHIVE "--whole-archive")
+#set(STOP_WHOLE_ARCHIVE  "--no-whole-archive")
+#set(START_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${START_WHOLE_ARCHIVE}")
+#set(STOP_WHOLE_ARCHIVE "${COMPILER_LINKER_OPTION_PREFIX}${STOP_WHOLE_ARCHIVE}")
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM   NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY   NEVER)
@@ -210,18 +207,16 @@ include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/src)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/vendor)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor)
 
-
 # FreeRTOS
 include_directories(
     ${OSAL_FREERTOS_INC_DIR}
-    ${OSAL_FREERTOS_SRC_DIR}/portable/GCC/ARM_CM4F
+    ${OSAL_FREERTOS_SRC_DIR}/include
+    ${OSAL_FREERTOS_SRC_DIR}/portable/GCC/RISC-V
 )
 
 # FreeRTOS BSP vendored code
 include_directories(
-    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor/CMSIS/Include
-    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor/CMSIS/Device/ST/STM32F7xx/Include
-    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor/STM32F7xx_HAL_Driver/Inc
+    ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor
 )
 
 
@@ -238,15 +233,16 @@ message("+++ OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 message("+++ CMAKE_CURRENT_BINARY_DIR '${CMAKE_CURRENT_BINARY_DIR}'.")
 
 
-# These OSAL configurations are specific to FreeRTOS and 
+# These OSAL configurations are specific to FreeRTOS and
 # have no mapping in osconfig.h.in
-add_definitions(-DOS_TIMEBASE_TASK_STACK_SIZE=1024) # OSAL semantics, size in bytes
+add_definitions(-DOS_TIMEBASE_TASK_STACK_SIZE=2048) # OSAL semantics, size in bytes
 add_definitions(-DOS_TIMEBASE_TASK_PRIORITY=25)     # OSAL semantics, lower value is lower priority
-add_definitions(-DBSP_MAIN_TASK_STACK_SIZE_BYTES=2048)
+add_definitions(-DBSP_MAIN_TASK_STACK_SIZE_BYTES=6144)
 add_definitions(-DBSP_MAIN_TASK_PRIORITY=150)
-add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=128)
-#add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
-#add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
+add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=256)
+add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
+add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
+#add_definitions(-DIDLE_TASK_REPORT_TASKS=1)       # FreeRTOS tasks and stack usage
 add_definitions(-DOS_ASSERT_USE_TASK_NAME=1)      # Use OSAL task name inspection during assertions.
 #add_definitions(-DFREERTOS_TRACE_ENABLED=1)
 
@@ -266,8 +262,8 @@ if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
 endif()
 
 # These FreeRTOS configurations are applied to FreeRTOSConfig.h.in
-set (FREERTOS_PLATFORM_STACK_MIN_WORDS        128)
-math(EXPR FREERTOS_PLATFORM_HEAP_SIZE_BYTES "50 * 1024")
+set (FREERTOS_PLATFORM_STACK_MIN_WORDS      512)
+math(EXPR FREERTOS_PLATFORM_HEAP_SIZE_BYTES "120 * 1024")
 
 
 configure_file("${MY_MISSION_DEFS_DIR}/FreeRTOSConfig.h.in"

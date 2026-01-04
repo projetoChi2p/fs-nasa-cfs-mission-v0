@@ -36,14 +36,22 @@ add_compile_options(
 )
 
 add_definitions(-DMPFS_DISCOVERY_KIT)
+set(MPFS_HARDWARE_DESIGN "mpfs-discovery-kit-design_v0.2")
+
 # add_definitions(-DFREERTOS_TRACE_ENABLED)
 # add_definitions(-DENABLE_FI)
 
-set(MPFS_HARDWARE_DESIGN "mpfs-discovery-kit-design_v0.2")
+set(CMAKE_VERBOSE_MAKEFILE true)
+
+# Xilinx Memory Filesystem
 set(OSAL_RAMDISK_FILESYSTEM_IS_MFS True)
-set(CMAKE_VERBOSE_MAKEFILE false)
+# FreeRTOS+ FAT Filesystem
+set(OSAL_RAMDISK_FILESYSTEM_IS_FREERTOS_PLUS_FAT False)
+# ChaN FatFs
 set(OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS True)
 
+set(TO_CON_APP_USE_STATIC_TABLE False)
+set(SCH_LAB_APP_USE_STATIC_TABLE False)
 
 set(GCCPREFIX   "riscv64-unknown-elf-")
 
@@ -52,6 +60,8 @@ find_program(CMAKE_C_COMPILER
   HINTS
     "$ENV{HOME}/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/"
     "/opt/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/"
+    "/opt/riscv-gnu-toolchain-12.2.0-2023.07.07-rv64imac_zicsr_zifencei/bin/"
+    # GCC 15 does not declare CSR alias for mtval as mbadaddr
   DOC "Find GNU GCC Toolchain"
   REQUIRED
 )
@@ -84,12 +94,16 @@ set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1-gcc-riscv
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
     set(OSAL_XILINX_MFS_SRC_DIR        "${THIRDPARTY_DIR}/xilinx-xilmfs-v2.3+")
-else()
+endif()
+
+if(OSAL_RAMDISK_FILESYSTEM_IS_FREERTOS_PLUS_FAT)
     set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat-2024-01-25-dev")
 endif()
 
-set(OSAL_FATFS_SRC_DIR "${THIRDPARTY_DIR}/fatfs")
-set(OSAL_FATFS_INC_DIR "${THIRDPARTY_DIR}/fatfs")
+if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
+    set(OSAL_FATFS_SRC_DIR "${THIRDPARTY_DIR}/fatfs")
+    set(OSAL_FATFS_INC_DIR "${THIRDPARTY_DIR}/fatfs")
+endif()
 
 message("+++ Using MY_MISSION_DEFS_DIR '${MY_MISSION_DEFS_DIR}'.")
 message("+++ Using TOP_PROJECT_DIR '${TOP_PROJECT_DIR}'.")
@@ -100,20 +114,30 @@ message("+++ Using OSAL_FREERTOS_SRC_DIR '${OSAL_FREERTOS_SRC_DIR}'.")
 message("+++ Using OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 
 
-# FreeRTOS
-include_directories(
-    ${OSAL_FREERTOS_INC_DIR}
-    ${OSAL_FREERTOS_SRC_DIR}/portable/GCC/RISC-V
-    ${OSAL_FREERTOS_SRC_DIR}/portable/GCC/RISC-V/chip_specific_extensions/RISCV_MTIME_CLINT_no_extensions
+execute_process(
+    COMMAND ${CMAKE_C_COMPILER} -dumpfullversion -dumpversion
+    OUTPUT_VARIABLE GCC_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+string(COMPARE GREATER_EQUAL "${GCC_VERSION}" "12.0.0" GCC_USE_STRICT_EXTENSIONS)
+if (${GCC_USE_STRICT_EXTENSIONS})
+    set(RISCV_MARCH rv64imac_zicsr_zifencei)
+    set(RISCV_MABI  lp64)
+else()
+    set(RISCV_MARCH rv64imac)
+    set(RISCV_MABI  lp64)
+endif()
+
+message("+++ GCC version is '${GCC_VERSION}'.")
+
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
-    # Xilinx Memory Filesystem
     include_directories(
         ${OSAL_XILINX_MFS_SRC_DIR}/src
     )
-else()
-    # FreeRTOS + FAT Filesystem
+endif()
+
+if(OSAL_RAMDISK_FILESYSTEM_IS_FREERTOS_PLUS_FAT)
     include_directories(
         ${OSAL_FREERTOS_PLUS_FAT_SRC_DIR}
         ${OSAL_FREERTOS_PLUS_FAT_SRC_DIR}/include
@@ -121,7 +145,6 @@ else()
 endif()
 
 if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
-    # FatFs
     include_directories(
         ${OSAL_FATFS_INC_DIR}
     )
@@ -156,8 +179,8 @@ set(CMAKE_ASM_FLAGS_DEBUG          "-g3 -ggdb -O1 -DDEBUG"     CACHE STRING "Ove
 
 
 add_compile_options(-Wall)
-add_compile_options(-march=rv64ima)                       # When using newer GCC, may require "rv64ima_zicsr_zifencei" 
-add_compile_options(-mabi=lp64 )
+add_compile_options(-march=${RISCV_MARCH})                # When using newer GCC, may require "rv64ima_zicsr_zifencei"
+add_compile_options(-mabi=${RISCV_MABI})
 add_compile_options(-msmall-data-limit=8)
 add_compile_options(-mcmodel=medany)                      # Memory model: how sparse memory addresses can be
 add_compile_options(-mstrict-align)                       # Memory access alignment
@@ -169,9 +192,9 @@ add_compile_options(-ffunction-sections -fdata-sections)  # Place functions and 
 add_compile_options(-frecord-gcc-switches)                # Keep track of compilation inside object files
 
 
-add_link_options(-march=rv64ima)                         # When using newer GCC, may require "rv64ima_zicsr_zifencei" 
-add_link_options(-mabi=lp64 )
-add_link_options(-mcmodel=medlow)                        # When using DDR, may require -mcmodel=medany
+add_link_options(-march=${RISCV_MARCH})                   # When using newer GCC, may require "rv64ima_zicsr_zifencei"
+add_link_options(-mabi=${RISCV_MABI})
+add_link_options(-mcmodel=medlow)                         # When using DDR, may require -mcmodel=medany
 add_link_options(-T ${LINKER_SCRIPT})
 add_link_options(-nostartfiles -Wl,--gc-sections)
 add_link_options(-specs=nano.specs)
@@ -188,22 +211,23 @@ include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/src)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/vendor)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor)
 
-# FreeRTOS BSP vendored code
+# FreeRTOS
 include_directories(
+    ${OSAL_FREERTOS_INC_DIR}
+    ${OSAL_FREERTOS_SRC_DIR}/include
     ${OSAL_FREERTOS_SRC_DIR}/portable/GCC/RISC-V
     ${OSAL_FREERTOS_SRC_DIR}/portable/GCC/RISC-V/chip_specific_extensions/RISCV_MTIME_CLINT_no_extensions
-    ${OSAL_FREERTOS_SRC_DIR}/include
 )
 
+# FreeRTOS BSP vendored code
 include_directories(
     ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/platform
     ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/
     ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/boards/${MPFS_HARDWARE_DESIGN}/platform_config/lim-release
     ${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/middleware
 )
-    
-# Include FreeRTOSConfig.h
-include_directories(${OSAL_SOURCE_DIR}/../obdh_v0_defs/)
+
+
 
 # FBV 2024-02-28 The include_directories below is only for debugging and should removed from final build.
 include_directories(${CFE_SOURCE_DIR}/modules/es/fsw/src)
@@ -217,7 +241,7 @@ message("+++ OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 message("+++ CMAKE_CURRENT_BINARY_DIR '${CMAKE_CURRENT_BINARY_DIR}'.")
 
 
-# These OSAL configurations are specific to FreeRTOS and 
+# These OSAL configurations are specific to FreeRTOS and
 # have no mapping in osconfig.h.in
 add_definitions(-DOS_TIMEBASE_TASK_STACK_SIZE=2048) # OSAL semantics, size in bytes
 add_definitions(-DOS_TIMEBASE_TASK_PRIORITY=25)     # OSAL semantics, lower value is lower priority
@@ -227,7 +251,7 @@ add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=128)
 # add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
 # add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
 add_definitions(-DOS_ASSERT_USE_TASK_NAME=1)      # Use OSAL task name inspection during assertions.
-
+#add_definitions(-DFREERTOS_TRACE_ENABLED=1)
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
     #add_definitions(-DOS_FILESYSTEM_ROMDISK_IS_XILMFS=1) # Uses Xilinx MFS for ROM disks
@@ -245,11 +269,11 @@ if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
 endif()
 
 # These FreeRTOS configurations are applied to FreeRTOSConfig.h.in
-set (FREERTOS_PLATFORM_STACK_MIN_WORDS        256)
+set (FREERTOS_PLATFORM_STACK_MIN_WORDS      256)
 math(EXPR FREERTOS_PLATFORM_HEAP_SIZE_BYTES "80 * 1024")
 
 
 configure_file("${MY_MISSION_DEFS_DIR}/FreeRTOSConfig.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/inc/FreeRTOSConfig.h")
 
-message("+++ Leaving  toolchain cmake ${CMAKE_CURRENT_LIST_FILE}.")
+message("+++ Leaving toolchain cmake ${CMAKE_CURRENT_LIST_FILE}.")

@@ -50,21 +50,10 @@
 
 
 #include <stdint.h>
-#if defined(FREERTOS_TRACE_ENABLED)
-  #define configUSE_APPLICATION_TASK_TAG 1
-  #define traceTASK_SWITCHED_IN()   HLP_vPrintChar((char) xTaskGetApplicationTaskTagFromISR(xTaskGetCurrentTaskHandle()),0)
-  #define traceTASK_SWITCHED_OUT()  HLP_vPrintChar((char) (xTaskGetApplicationTaskTagFromISR(xTaskGetCurrentTaskHandle())),32)
-
-#endif
-
 #include <stm32f767xx.h>
 extern uint32_t SystemCoreClock;
 #define TimebaseClock SystemCoreClock
 
-void HLP_vSystemConfigPerfCounter( void );
-uint32_t HLP_ulSystemGetPerfCounter( void );
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()          HLP_vSystemConfigPerfCounter()
-#define portGET_RUN_TIME_COUNTER_VALUE()                  HLP_ulSystemGetPerfCounter()
 
 
 #define configAPPLICATION_ALLOCATED_HEAP 1
@@ -80,6 +69,7 @@ uint32_t HLP_ulSystemGetPerfCounter( void );
 #define xPortPendSVHandler                              PendSV_Handler
 #define vPortSVCHandler                                 SVC_Handler
 #define xPortSysTickHandler                             SysTick_Handler
+
 
 #elif (defined(__i386__) && defined(__linux__) && defined(__GNUC__))
 
@@ -117,17 +107,11 @@ uint32_t HLP_ulSystemGetPerfCounter( void );
 // 888  T88b    888   Y88b  d88P Y88b  d88P         Y888P          Y88b  d88P       888  
 // 888   T88b 8888888  "Y8888P"   "Y8888P"           Y8P            "Y8888P"        888  
 
-#include <stdint.h>
+#ifdef MPFS_DISCOVERY_KIT
+
 /* PolarFire HAL includes. */
 #include "mpfs_hal/mss_hal.h"
 #include "drivers/mss/mss_mmuart/mss_uart.h"
-
-void HLP_vSystemConfigPerfCounter( void );
-uint32_t HLP_ulSystemGetPerfCounter( void );
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()          HLP_vSystemConfigPerfCounter()
-#define portGET_RUN_TIME_COUNTER_VALUE()                  HLP_ulSystemGetPerfCounter()
-
-
 
 /* FBV 2024-11-30 Ambiguity on CLINT timebase frequency.
  *
@@ -169,6 +153,20 @@ uint32_t HLP_ulSystemGetPerfCounter( void );
  */
 #define TimebaseClock LIBERO_SETTING_MSS_RTC_TOGGLE_CLK
 
+#define CLINT_CTRL_ADDR                         ( 0x02000000UL )
+
+#endif /* MPFS_DISCOVERY_KIT */
+
+
+#ifdef RISCV_NOELV
+
+#define CLINT_CTRL_ADDR                         ( 0xE0000000UL )
+/* NOEL-V ACLINT is fed by RTC clock, which is CPU clock/2 */
+#define TimebaseClock                           ( ( unsigned long ) (CPU_FREQUENCY/2) ) 
+
+#endif /* RISCV_NOELV */
+
+
 
 /* FBV 2024-11-30 When built for OSAL tests, symbol API test requires 
    a RAMDISK with 2048 blocks of 512 bytes.
@@ -188,7 +186,7 @@ uint32_t HLP_ulSystemGetPerfCounter( void );
  */
 //#define PLATFORM_HEAP_SIZE                      ( (size_t)((256*1024)+(2048*512)) )
 
-#define CLINT_CTRL_ADDR                         ( 0x02000000UL )
+
 #define configMTIME_BASE_ADDRESS                ( CLINT_CTRL_ADDR + 0xBFF8UL )
 #define configMTIMECMP_BASE_ADDRESS             ( CLINT_CTRL_ADDR + 0x4000UL )
 
@@ -229,14 +227,6 @@ uint32_t HLP_ulSystemGetPerfCounter( void );
 // Default is 1
 #define configTASK_NOTIFICATION_ARRAY_ENTRIES   3
 
-#if defined(FREERTOS_TRACE_ENABLED)
-  void extern HLP_vPrintChar(char, int8_t);
-  #define configUSE_APPLICATION_TASK_TAG 1
-  #define traceTASK_SWITCHED_IN()   HLP_vPrintChar((char) xTaskGetApplicationTaskTagFromISR(xTaskGetCurrentTaskHandle()),0)
-  #define traceTASK_SWITCHED_OUT()  HLP_vPrintChar((char) (xTaskGetApplicationTaskTagFromISR(xTaskGetCurrentTaskHandle())),32)
-#endif
-
-
 #else
 
 #error Unknown/Unsupported/Untested target platform/compiler
@@ -274,6 +264,22 @@ extern void vAssertCalled( const char * const pcFileName,
 
 #define configUSE_TRACE_FACILITY                        1
 #define configUSE_STATS_FORMATTING_FUNCTIONS            1  // human readable stats
+
+#if defined(FREERTOS_TRACE_ENABLED)
+  #define configUSE_APPLICATION_TASK_TAG 1
+  void extern HLP_vPrintChar(char, char);
+  #define traceTASK_SWITCHED_IN()   HLP_vPrintChar((char) xTaskGetApplicationTaskTagFromISR(xTaskGetCurrentTaskHandle()),0)
+  #define traceTASK_SWITCHED_OUT()  HLP_vPrintChar((char) (xTaskGetApplicationTaskTagFromISR(xTaskGetCurrentTaskHandle())),32)
+#endif
+
+
+#include <stdint.h>
+/* FBV 2025-12-31 configRUN_TIME_COUNTER_TYPE defaults to uint32_t */
+void HLP_vSystemConfigPerfCounter( void );
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()          HLP_vSystemConfigPerfCounter()
+uint32_t HLP_ulSystemGetPerfCounter( void );
+#define portGET_RUN_TIME_COUNTER_VALUE()                  HLP_ulSystemGetPerfCounter()
+
 
 #define configGENERATE_RUN_TIME_STATS                   1
 //#define configRUN_TIME_COUNTER_TYPE                       uint64_t

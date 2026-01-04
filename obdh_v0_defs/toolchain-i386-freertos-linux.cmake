@@ -35,8 +35,21 @@ add_compile_options(
     -Wfatal-errors              # Stop on first compilation error
 )
 
-set(OSAL_RAMDISK_FILESYSTEM_IS_MFS True)
+# add_definitions(-DFREERTOS_TRACE_ENABLED)
+
 set(CMAKE_VERBOSE_MAKEFILE true)
+
+# Xilinx Memory Filesystem
+set(OSAL_RAMDISK_FILESYSTEM_IS_MFS               True)
+# FreeRTOS+ FAT Filesystem
+set(OSAL_RAMDISK_FILESYSTEM_IS_FREERTOS_PLUS_FAT False)
+# ChaN FatFs
+set(OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS        False)
+
+set(TO_CON_APP_USE_STATIC_TABLE  True)
+set(SCH_LAB_APP_USE_STATIC_TABLE True)
+
+
 
 
 set(GCCPREFIX "x86_64-linux-gnu-")
@@ -81,8 +94,15 @@ set(OSAL_FREERTOS_SRC_DIR          "${THIRDPARTY_DIR}/freertos-v10.5.1-v202212.0
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
     set(OSAL_XILINX_MFS_SRC_DIR        "${THIRDPARTY_DIR}/xilinx-xilmfs-v2.3+")
-else()
+endif()
+
+if(OSAL_RAMDISK_FILESYSTEM_IS_FREERTOS_PLUS_FAT)
     set(OSAL_FREERTOS_PLUS_FAT_SRC_DIR "${THIRDPARTY_DIR}/freertos-plus-fat-2024-01-25-dev")
+endif()
+
+if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
+    set(OSAL_FATFS_SRC_DIR "${THIRDPARTY_DIR}/fatfs")
+    set(OSAL_FATFS_INC_DIR "${THIRDPARTY_DIR}/fatfs")
 endif()
 
 message("+++ Using MY_MISSION_DEFS_DIR '${MY_MISSION_DEFS_DIR}'.")
@@ -94,23 +114,24 @@ message("+++ Using OSAL_FREERTOS_SRC_DIR '${OSAL_FREERTOS_SRC_DIR}'.")
 message("+++ Using OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 
 
-# FreeRTOS
-include_directories(
-    ${OSAL_FREERTOS_INC_DIR}
-    ${OSAL_FREERTOS_SRC_DIR}/include
-    ${OSAL_FREERTOS_SRC_DIR}/portable/ThirdParty/GCC/Posix
-)
+
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
-    # Xilinx Memory Filesystem
     include_directories(
         ${OSAL_XILINX_MFS_SRC_DIR}/src
     )
-else()
-    # FreeRTOS + FAT Filesystem
+endif()
+
+if(OSAL_RAMDISK_FILESYSTEM_IS_FREERTOS_PLUS_FAT)
     include_directories(
         ${OSAL_FREERTOS_PLUS_FAT_SRC_DIR}
         ${OSAL_FREERTOS_PLUS_FAT_SRC_DIR}/include
+    )
+endif()
+
+if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
+    include_directories(
+        ${OSAL_FATFS_INC_DIR}
     )
 endif()
 
@@ -165,8 +186,13 @@ include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/src)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/shared-freertos/vendor)
 include_directories(${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/vendor)
 
-# Include FreeRTOSConfig.h
-include_directories(${OSAL_SOURCE_DIR}/../obdh_v0_defs/)
+# FreeRTOS
+include_directories(
+    ${OSAL_FREERTOS_INC_DIR}
+    ${OSAL_FREERTOS_SRC_DIR}/include
+    ${OSAL_FREERTOS_SRC_DIR}/portable/ThirdParty/GCC/Posix
+)
+
 
 # FBV 2024-02-28 The include_directories below is only for debugging and should removed from final build.
 include_directories(${CFE_SOURCE_DIR}/modules/es/fsw/src)
@@ -190,7 +216,7 @@ add_definitions(-DFREERTOS_IDLE_TASK_STACK_SIZE_WORDS=128)
 add_definitions(-DOS_CONSOLE_TASK_REPORT_TASKS=1) # FreeRTOS tasks and stack usage
 add_definitions(-DOS_CONSOLE_TASK_REPORT_FILES=1) # FreeRTOS filesystem and files usage
 add_definitions(-DOS_ASSERT_USE_TASK_NAME=1)      # Use OSAL task name inspection during assertions.
-
+#add_definitions(-DFREERTOS_TRACE_ENABLED=1)
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
     #add_definitions(-DOS_FILESYSTEM_ROMDISK_IS_XILMFS=1) # Uses Xilinx MFS for ROM disks
@@ -203,6 +229,10 @@ if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
     add_definitions(-DMFS_MAX_FILESYSTEM=2)       # Must be >= OSAL_CONFIG_MAX_FILE_SYSTEMS
 endif()
 
+if (OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS)
+    add_definitions(-DOS_FILESYSTEM_NON_VOLATILE_IS_FATFS=1)
+endif()
+
 # These FreeRTOS configurations are applied to FreeRTOSConfig.h.in
 set (FREERTOS_PLATFORM_STACK_MIN_WORDS   "(PTHREAD_STACK_MIN/4)" ) # Is portSTACK_TYPE unsigned long?
 math(EXPR FREERTOS_PLATFORM_HEAP_SIZE_BYTES "(256*1024)+(2048*512)")
@@ -211,4 +241,4 @@ math(EXPR FREERTOS_PLATFORM_HEAP_SIZE_BYTES "(256*1024)+(2048*512)")
 configure_file("${MY_MISSION_DEFS_DIR}/FreeRTOSConfig.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/inc/FreeRTOSConfig.h")
 
-message("+++ Leaving  toolchain cmake ${CMAKE_CURRENT_LIST_FILE}.")
+message("+++ Leaving toolchain cmake ${CMAKE_CURRENT_LIST_FILE}.")

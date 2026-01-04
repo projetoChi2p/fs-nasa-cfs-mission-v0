@@ -131,9 +131,21 @@ list(APPEND cpu1_STATIC_APPLIST huff_app)
 
 #m7cpu_STATIC_APPLIST
 #SET(cpu1_FILELIST cfe_es_startup.scr)
-list(APPEND cpu1_EMBED_FILELIST
-    "STARTUP_SCR,cfe_es_startup.scr"
-)
+
+# FBV 2026-01-04 We are using $SIMULATION to select the architecture
+#                since this same mission defs are reused for several 
+#                different target boards reusing the same MISSIONCONFIG
+#                and cpuname.
+if(SIMULATION MATCHES "noelv")
+    message(WARNING "+++ Using startup script file with increased stack.")
+    list(APPEND cpu1_EMBED_FILELIST
+        "STARTUP_SCR,cfe_es_startup_g.scr"
+    )
+else()
+    list(APPEND cpu1_EMBED_FILELIST
+        "STARTUP_SCR,cfe_es_startup.scr"
+    )
+endif()
 
 # See *_mission_cfg.h for CFE_MISSION_EVS_MAX_MESSAGE_LENGTH
 # See *.cmake for OSAL_CONFIG_MAX_API_NAME a.k.a. OS_MAX_API_NAME
@@ -174,7 +186,7 @@ list(APPEND cpu1_STATIC_SYMLIST
 )
 
 
-# This *_SYSTEM parameters can be overriden by SIMULATION parameter
+# This *_SYSTEM parameter is overriden by SIMULATION parameter
 SET(cpu1_SYSTEM i686-linux-gnu)
 
 # CPU2 example.  This is not built by default anymore but
@@ -187,5 +199,3 @@ SET(cpu1_SYSTEM i686-linux-gnu)
 #SET(cpu1_PSP_MODULELIST
 #    soft_timebase
 #)
-
-
