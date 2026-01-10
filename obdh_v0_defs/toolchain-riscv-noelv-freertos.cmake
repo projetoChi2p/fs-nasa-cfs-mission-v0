@@ -257,7 +257,7 @@ message("+++ OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 message("+++ CMAKE_CURRENT_BINARY_DIR '${CMAKE_CURRENT_BINARY_DIR}'.")
 
 # For NOEL-V MC-lite running at 50 MHz
-add_definitions(-DMSG_MXM_HUFF_WORK_TICKS 30)
+add_definitions(-DMSG_MXM_HUFF_WORK_TICKS=30)
 
 # These OSAL configurations are specific to FreeRTOS and
 # have no mapping in osconfig.h.in
