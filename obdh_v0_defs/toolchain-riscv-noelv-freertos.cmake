@@ -61,15 +61,28 @@ set(SCH_LAB_APP_USE_STATIC_TABLE True)
 
 set(GCCPREFIX   "riscv64-unknown-elf-")
 
-find_program(CMAKE_C_COMPILER
-  NAMES ${GCCPREFIX}gcc
-  HINTS
-    "$ENV{HOME}/riscv-gnu-toolchain-15.1.0-2025.12.27-multilib/riscv64-unknown-elf/bin/"
-    "/opt/riscv-gnu-toolchain-15.1.0-2025.12.27-multilib/bin/"
-    "/home/hot/inf/projects/toolchain_riscv/riscv-gnu-toolchain-15.1.0-2025.12.27-multilib/bin/"
-  DOC "Find GNU GCC Toolchain"
-  REQUIRED
-)
+
+
+set(RISCV_GCC_PATH $ENV{RISCV_GCC_PATH})
+if ("${RISCV_GCC_PATH}" STREQUAL "")
+    find_program(CMAKE_C_COMPILER
+        NAMES ${GCCPREFIX}gcc
+        HINTS
+            "/opt/riscv-gnu-toolchain-15.1.0-2025.12.27-multilib//bin"
+        DOC "Find GNU GCC Toolchain"
+        REQUIRED
+    )
+else()
+    find_program(CMAKE_C_COMPILER
+        NAMES ${GCCPREFIX}gcc
+        HINTS
+            "${RISCV_GCC_PATH}/bin/"
+        DOC "Find GNU GCC Toolchain"
+        REQUIRED
+    )
+endif()
+
+
 
 GET_FILENAME_COMPONENT(GCCPATH      "${CMAKE_C_COMPILER}"                 DIRECTORY)
 string(APPEND GCCPATH "/")
@@ -149,8 +162,8 @@ set(CFE_SYSTEM_PSPNAME      "noelv-freertos")
 set(OSAL_SYSTEM_BSPTYPE     "noelv-freertos")
 set(OSAL_SYSTEM_OSTYPE      "freertos")
 
-set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/scripts/link_ram_ddr.ld")
-#set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/scripts/link_xip_ddr.ld")
+#set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/scripts/link_ram_ddr.ld")
+set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/scripts/link_xip_ddr.ld")
 #set(LINKER_SCRIPT "${OSAL_SOURCE_DIR}/src/bsp/${OSAL_SYSTEM_BSPTYPE}/scripts/link_ddr_ddr.ld")
 
 # CMake default are:
@@ -168,9 +181,20 @@ set(CMAKE_C_FLAGS_DEBUG            "-g3 -ggdb -O0 -DDEBUG"     CACHE STRING "Ove
 set(CMAKE_ASM_FLAGS_DEBUG          "-g3 -ggdb -O0 -DDEBUG"     CACHE STRING "Overriden by OSAL/cFS toolchain defs." FORCE)
 
 
+set(RISCV_MARCH $ENV{RISCV_MARCH})
+if ("${RISCV_MARCH}" STREQUAL "")
+    set(RISCV_MARCH "rv64imafdc")
+endif()
+
+set(RISCV_MABI $ENV{RISCV_MABI})
+if ("${RISCV_MABI}" STREQUAL "")
+    set(RISCV_MABI "lp64d")
+endif()
+
+
 add_compile_options(-Wall)
-add_compile_options(-march=rv64imafdc)                    # For integer-only/soft-float, use rv64imac/lp64"
-add_compile_options(-mabi=lp64d )
+add_compile_options(-march=${RISCV_MARCH})                # For integer-only/soft-float, use rv64imac/lp64"
+add_compile_options(-mabi=${RISCV_MABI})
 add_compile_options(-msmall-data-limit=8)
 add_compile_options(-mcmodel=medany)                      # Memory model: how sparse memory addresses can be (medlow/medany/large)
 add_compile_options(-mstrict-align)                       # Memory access alignment
@@ -182,8 +206,8 @@ add_compile_options(-ffunction-sections -fdata-sections)  # Place functions and 
 add_compile_options(-frecord-gcc-switches)                # Keep track of compilation inside object files
 
 
-add_link_options(-march=rv64imafdc)                       # When using newer GCC, may require "rv64ima_zicsr_zifencei"
-add_link_options(-mabi=lp64d)
+add_link_options(-march=${RISCV_MARCH})                   # When using newer GCC, may require "rv64ima_zicsr_zifencei"
+add_link_options(-mabi=${RISCV_MABI})
 add_link_options(-mcmodel=medany)                         # When using DDR, may require -mcmodel=medany
 add_link_options(-T ${LINKER_SCRIPT})
 add_link_options(-nostartfiles -Wl,--gc-sections)
@@ -232,6 +256,8 @@ message("+++ TARGETSYSTEM '${TARGETSYSTEM}'.")
 message("+++ OSAL_SOURCE_DIR '${OSAL_SOURCE_DIR}'.")
 message("+++ CMAKE_CURRENT_BINARY_DIR '${CMAKE_CURRENT_BINARY_DIR}'.")
 
+# For NOEL-V MC-lite running at 50 MHz
+add_definitions(-DMSG_MXM_HUFF_WORK_TICKS 30)
 
 # These OSAL configurations are specific to FreeRTOS and
 # have no mapping in osconfig.h.in

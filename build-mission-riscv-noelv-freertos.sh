@@ -13,6 +13,12 @@ SIMULATION="riscv-noelv-freertos"
 
 # Set Make verbose
 export VERBOSE=1
+# 2026-01-10 FBV FreeRTOS, while handling exception, make assumptions about
+#                instruction size. It may or may not be safe.
+#                Just in case, we can avoid the C extension.
+export RISCV_MARCH="rv64ima_zicsr_zifencei"
+export RISCV_MABI="lp64"
+export RISCV_GCC_PATH=/opt/riscv-gnu-toolchain-15.1.0-2025.12.27-rv64ima_zicsr_zifencei
 
 # ``SIMULATION``: If set, this will override the architecture(s) specified 
 # in the targets file.

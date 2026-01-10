@@ -131,7 +131,7 @@
 //#define CFE_PLATFORM_ES_START_TASK_STACK_SIZE CFE_PLATFORM_ES_DEFAULT_STACK_SIZE
 #if (defined(__riscv) && (__riscv_xlen == 64) && (__riscv_flen == 0) && !defined(__linux__))
 // ES in RV64 requires a bit more stack to stay near 1/2 watermark
-#define CFE_PLATFORM_ES_START_TASK_STACK_SIZE MAX_CONSTANT(6*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#define CFE_PLATFORM_ES_START_TASK_STACK_SIZE MAX_CONSTANT(8*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
 #elif (defined(__riscv) && (__riscv_xlen == 64) && (__riscv_flen > 0) && !defined(__linux__))
 // ES in RV64G requires a lot more stack to stay near 1/2 watermark
 #define CFE_PLATFORM_ES_START_TASK_STACK_SIZE MAX_CONSTANT(9*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
@@ -750,7 +750,7 @@
 #elif (defined(__arm__) && !defined(__linux__))
 #define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE (2*1024)
 #elif (defined(__riscv) && (__riscv_xlen == 64) && (__riscv_flen == 0) && !defined(__linux__))
-#define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE MAX_CONSTANT(2*1024, 4*1024)
+#define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE MAX_CONSTANT(2*1024, 6*1024)
 #elif (defined(__riscv) && (__riscv_xlen == 64) && (__riscv_flen > 0) && !defined(__linux__))
 #define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE MAX_CONSTANT(2*1024, 6*1024)
 #else
@@ -1372,7 +1372,7 @@
 
 #if (defined(__riscv) && (__riscv_xlen == 64) && (__riscv_flen == 0) && !defined(__linux__))
 // SB in RV64 requires a bit more stack to stay near 1/2 watermark
-#define CFE_PLATFORM_SB_START_TASK_STACK_SIZE MAX_CONSTANT(6*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
+#define CFE_PLATFORM_SB_START_TASK_STACK_SIZE MAX_CONSTANT(8*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
 #elif (defined(__riscv) && (__riscv_xlen == 64) && (__riscv_flen > 0) && !defined(__linux__))
 // SB in RV64 requires a lot more stack to stay near 1/2 watermark
 #define CFE_PLATFORM_SB_START_TASK_STACK_SIZE MAX_CONSTANT(9*1024,CFE_PLATFORM_ES_DEFAULT_STACK_SIZE)
