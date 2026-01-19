@@ -59,8 +59,11 @@ set(OSAL_NON_VOLATILE_FILESYSTEM_IS_FATFS        False)
 set(TO_CON_APP_USE_STATIC_TABLE  True)
 set(SCH_LAB_APP_USE_STATIC_TABLE True)
 
-set(GCCPREFIX   "riscv64-unknown-elf-")
 
+set(GCCPREFIX $ENV{RISCV_GCC_TRIPLET})
+if ("${GCCPREFIX}" STREQUAL "")
+    set(GCCPREFIX   "riscv64-unknown-elf-")
+endif()
 
 
 set(RISCV_GCC_PATH $ENV{RISCV_GCC_PATH})
@@ -68,7 +71,7 @@ if ("${RISCV_GCC_PATH}" STREQUAL "")
     find_program(CMAKE_C_COMPILER
         NAMES ${GCCPREFIX}gcc
         HINTS
-            "/opt/riscv-gnu-toolchain-15.1.0-2025.12.27-multilib//bin"
+            "/opt/riscv-gnu-toolchain-15.1.0-2025.12.27-multilib/bin"
         DOC "Find GNU GCC Toolchain"
         REQUIRED
     )

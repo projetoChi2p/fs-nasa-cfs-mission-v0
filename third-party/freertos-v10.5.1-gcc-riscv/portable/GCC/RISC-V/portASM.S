@@ -359,6 +359,7 @@ handle_interrupt:
         bne a0, t1, application_interrupt_handler
 
         portUPDATE_MTIMER_COMPARE_REGISTER
+        call vPortEnterTimerInterrupt
         call xTaskIncrementTick
         beqz a0, processed_source       /* Don't switch context if incrementing tick didn't unblock a task. */
         call vTaskSwitchContext
