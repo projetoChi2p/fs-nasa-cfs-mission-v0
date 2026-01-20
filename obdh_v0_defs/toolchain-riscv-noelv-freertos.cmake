@@ -42,7 +42,20 @@ add_compile_options(
     -Wno-error=unused-parameter # There are unused parameters in OSAL common code from NASA.
 )
 
-add_definitions(-DRISCV_NOELV -DRISCV_NOELV_GP64 -DCPU_FREQUENCY=50000000UL)
+add_definitions(-DRISCV_NOELV -DCPU_FREQUENCY=50000000UL)
+
+# NOEL-V GP system target (cmake -DCONFIG_NOELV_GP=1)
+if(NOT DEFINED CONFIG_NOELV_GP)
+    # NOEL-V GP system target (export CONFIG_NOELV_GP=1)
+    if(DEFINED ENV{CONFIG_NOELV_GP})
+        set(CONFIG_NOELV_GP $ENV{CONFIG_NOELV_GP})
+    endif()
+endif()
+
+if (CONFIG_NOELV_GP)
+    add_definitions(-DCONFIG_NOELV_GP=1) # Build for NOEL-V GP system target
+endif()
+
 
 # add_definitions(-DFREERTOS_TRACE_ENABLED)
 # add_definitions(-DENABLE_FI)
