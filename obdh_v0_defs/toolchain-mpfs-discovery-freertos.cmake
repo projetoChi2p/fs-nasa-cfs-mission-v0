@@ -58,8 +58,8 @@ set(GCCPREFIX   "riscv64-unknown-elf-")
 find_program(CMAKE_C_COMPILER
   NAMES ${GCCPREFIX}gcc
   HINTS
-    "$ENV{HOME}/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/"
-    "/opt/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/"
+    # "$ENV{HOME}/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/"
+    # "/opt/Microchip/SoftConsole-v2022.2-RISC-V-747/riscv-unknown-elf-gcc/bin/"
     "/opt/riscv-gnu-toolchain-12.2.0-2023.07.07-rv64imac_zicsr_zifencei/bin/"
     # GCC 15 does not declare CSR alias for mtval as mbadaddr
   DOC "Find GNU GCC Toolchain"
@@ -120,16 +120,16 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-string(COMPARE GREATER_EQUAL "${GCC_VERSION}" "12.0.0" GCC_USE_STRICT_EXTENSIONS)
-if (${GCC_USE_STRICT_EXTENSIONS})
-    set(RISCV_MARCH rv64imac_zicsr_zifencei)
-    set(RISCV_MABI  lp64)
+if(GCC_VERSION VERSION_GREATER_EQUAL "12.0.0")
+    set(RISCV_MARCH "rv64imac_zicsr_zifencei")
+    set(RISCV_MABI  "lp64")
 else()
-    set(RISCV_MARCH rv64imac)
-    set(RISCV_MABI  lp64)
+    set(RISCV_MARCH "rv64imac")
+    set(RISCV_MABI  "lp64")
 endif()
 
-message("+++ GCC version is '${GCC_VERSION}'.")
+message(STATUS "+++ GCC version is '${GCC_VERSION}'.")
+message(STATUS "+++ Selected MARCH: ${RISCV_MARCH}")
 
 if(OSAL_RAMDISK_FILESYSTEM_IS_MFS)
     include_directories(
