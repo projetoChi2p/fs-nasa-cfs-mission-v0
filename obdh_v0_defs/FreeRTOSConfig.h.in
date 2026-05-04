@@ -38,14 +38,14 @@
 #if (defined(__arm__) && !defined(__linux__) && defined(__GNUC__))
 
 // http://patorjk.com/software/taag/#f=Colossal
-//        d8888 8888888b.  888b     d888        .d8888b.                   888                            888b     d888       
-//       d88888 888   Y88b 8888b   d8888       d88P  Y88b                  888                            8888b   d8888       
-//      d88P888 888    888 88888b.d88888       888    888                  888                            88888b.d88888       
-//     d88P 888 888   d88P 888Y88888P888       888         .d88b.  888d888 888888  .d88b.  888  888       888Y88888P888       
-//    d88P  888 8888888P"  888 Y888P 888       888        d88""88b 888P"   888    d8P  Y8b `Y8bd8P'       888 Y888P 888       
-//   d88P   888 888 T88b   888  Y8P  888       888    888 888  888 888     888    88888888   X88K  888888 888  Y8P  888       
-//  d8888888888 888  T88b  888   "   888       Y88b  d88P Y88..88P 888     Y88b.  Y8b.     .d8""8b.       888   "   888       
-// d88P     888 888   T88b 888       888        "Y8888P"   "Y88P"  888      "Y888  "Y8888  888  888       888       888    
+//        d8888 8888888b.  888b     d888        .d8888b.                   888                            888b     d888
+//       d88888 888   Y88b 8888b   d8888       d88P  Y88b                  888                            8888b   d8888
+//      d88P888 888    888 88888b.d88888       888    888                  888                            88888b.d88888
+//     d88P 888 888   d88P 888Y88888P888       888         .d88b.  888d888 888888  .d88b.  888  888       888Y88888P888
+//    d88P  888 8888888P"  888 Y888P 888       888        d88""88b 888P"   888    d8P  Y8b `Y8bd8P'       888 Y888P 888
+//   d88P   888 888 T88b   888  Y8P  888       888    888 888  888 888     888    88888888   X88K  888888 888  Y8P  888
+//  d8888888888 888  T88b  888   "   888       Y88b  d88P Y88..88P 888     Y88b.  Y8b.     .d8""8b.       888   "   888
+// d88P     888 888   T88b 888       888        "Y8888P"   "Y88P"  888      "Y888  "Y8888  888  888       888       888
 
 
 
@@ -74,16 +74,16 @@ extern uint32_t SystemCoreClock;
 #elif (defined(__i386__) && defined(__linux__) && defined(__GNUC__))
 
 // http://patorjk.com/software/taag/#f=Colossal
-// 8888888b.   .d88888b.   .d8888b. 8888888 Y88b   d88P 
-// 888   Y88b d88P" "Y88b d88P  Y88b  888    Y88b d88P  
-// 888    888 888     888 Y88b.       888     Y88o88P   
-// 888   d88P 888     888  "Y888b.    888      Y888P    
-// 8888888P"  888     888     "Y88b.  888      d888b    
-// 888        888     888       "888  888     d88888b   
-// 888        Y88b. .d88P Y88b  d88P  888    d88P Y88b  
-// 888         "Y88888P"   "Y8888P" 8888888 d88P   Y88b 
+// 8888888b.   .d88888b.   .d8888b. 8888888 Y88b   d88P
+// 888   Y88b d88P" "Y88b d88P  Y88b  888    Y88b d88P
+// 888    888 888     888 Y88b.       888     Y88o88P
+// 888   d88P 888     888  "Y888b.    888      Y888P
+// 8888888P"  888     888     "Y88b.  888      d888b
+// 888        888     888       "888  888     d88888b
+// 888        Y88b. .d88P Y88b  d88P  888    d88P Y88b
+// 888         "Y88888P"   "Y8888P" 8888888 d88P   Y88b
 
-#include <pthread.h> 
+#include <pthread.h>
 #include <limits.h>
 
 /* FBV 2024-11-30 Where is SystemCoreClock???
@@ -94,18 +94,18 @@ extern uint32_t SystemCoreClock;
 
 #define configPRIO_BITS         4        /* 15 priority levels */
 
-
-#elif (defined(__riscv) && (__riscv_xlen == 64) && !defined(__linux__) && defined(__GNUC__))
+#elif (defined(__riscv) && ((__riscv_xlen == 64) || (__riscv_xlen == 32))  \
+  && !defined(__linux__) && defined(__GNUC__))
 
 // http://patorjk.com/software/taag/#f=Colossal
-// 8888888b.  8888888  .d8888b.   .d8888b.       888     888        .d8888b.      d8888  
-// 888   Y88b   888   d88P  Y88b d88P  Y88b      888     888       d88P  Y88b    d8P888  
-// 888    888   888   Y88b.      888    888      888     888       888          d8P 888  
-// 888   d88P   888    "Y888b.   888             Y88b   d88P       888d888b.   d8P  888  
-// 8888888P"    888       "Y88b. 888              Y88b d88P        888P "Y88b d88   888  
-// 888 T88b     888         "888 888    888 888888 Y88o88P         888    888 8888888888 
-// 888  T88b    888   Y88b  d88P Y88b  d88P         Y888P          Y88b  d88P       888  
-// 888   T88b 8888888  "Y8888P"   "Y8888P"           Y8P            "Y8888P"        888  
+// 8888888b.  8888888  .d8888b.   .d8888b.       888     888        .d8888b.      d8888
+// 888   Y88b   888   d88P  Y88b d88P  Y88b      888     888       d88P  Y88b    d8P888
+// 888    888   888   Y88b.      888    888      888     888       888          d8P 888
+// 888   d88P   888    "Y888b.   888             Y88b   d88P       888d888b.   d8P  888
+// 8888888P"    888       "Y88b. 888              Y88b d88P        888P "Y88b d88   888
+// 888 T88b     888         "888 888    888 888888 Y88o88P         888    888 8888888888
+// 888  T88b    888   Y88b  d88P Y88b  d88P         Y888P          Y88b  d88P       888
+// 888   T88b 8888888  "Y8888P"   "Y8888P"           Y8P            "Y8888P"        888
 
 #ifdef MPFS_DISCOVERY_KIT
 
@@ -118,20 +118,20 @@ extern uint32_t SystemCoreClock;
  * For SiFive/Rocket Chip CPU, CLINT MTIME depends on rtcTick.
  * rtcTick (via clint.module.io.rtcTick) comes from RTC module.
  * rtcTick depends on rtcFreq, which comes from DTSTimebase.
- * 
+ *
  * From SiFive github repo, the frequency would be 1000000 Hz
  * in Freedom Unleashed U500, and 32768 for Freedom Everywhere E300.
- * 
+ *
  * However, in FreeRTOS/Demo/RISC-V_RV64_PolarFire_SoftConsole/FreeRTOSConfig.h
  * configCPU_CLOCK_HZ is defined as 32768.
- * Under FreeRTOS/Demo, configCPU_CLOCK_HZ is 32768 also for HiFive 1 RISC-V 32 
+ * Under FreeRTOS/Demo, configCPU_CLOCK_HZ is 32768 also for HiFive 1 RISC-V 32
  * bits but 1000000 for SiFive e310.
- * 
- * Baremetal samples from Microchip using MTIME and MTIMECMP rely on 
+ *
+ * Baremetal samples from Microchip using MTIME and MTIMECMP rely on
  * LIBERO_SETTING_MSS_RTC_TOGGLE_CLK for RTC frequency, with default
  * value 1000000, which is consistent with U500 source code.
  *
- * For the MPFS design configured with PFSoC configurator, the 
+ * For the MPFS design configured with PFSoC configurator, the
  * LIBERO_SETTING_MSS_RTC_TOGGLE_CLK value also is default 1000000.
  *
  * PFSoC configurator informs that the clock souce for RTC is
@@ -139,21 +139,25 @@ extern uint32_t SystemCoreClock;
  * clock (REFCLK) at I/O bank 5 at 125 MHz.
  * The Libero design using this REFCLK show consistency with other known
  * clocks, e.g. the 50 MHz Fabric clock.
- * 
+ *
  * Finally, there is example code from Microchip indicating that clock
  * divisor for RTC is reconfigurable at run-time by means of the
  * RTC_CLOCK_CR peripheral register.
  * At Microchip example code the RTC_CLOCK_CR is set as
  * LIBERO_SETTING_MSS_EXT_SGMII_REF_CLK/LIBERO_SETTING_MSS_RTC_TOGGLE_CLK.
- * 
+ *
  * This is also implemented in set_RTC_divisor() from PLL driver.
  * Inspection of RTC_CLOCK_CR on boot confirmed that divisor is 125 and
  * RTC clock is 1000000 Hz.
- * 
+ *
  */
 #define TimebaseClock LIBERO_SETTING_MSS_RTC_TOGGLE_CLK
 
 #define CLINT_CTRL_ADDR                         ( 0x02000000UL )
+
+#define configMTIME_BASE_ADDRESS                ( CLINT_CTRL_ADDR + 0xBFF8UL )
+#define configMTIMECMP_BASE_ADDRESS             ( CLINT_CTRL_ADDR + 0x4000UL )
+
 
 #endif /* MPFS_DISCOVERY_KIT */
 
@@ -162,13 +166,25 @@ extern uint32_t SystemCoreClock;
 
 #define CLINT_CTRL_ADDR                         ( 0xE0000000UL )
 /* NOEL-V ACLINT is fed by RTC clock, which is CPU clock/2 */
-#define TimebaseClock                           ( ( unsigned long ) (CPU_FREQUENCY/2) ) 
+#define TimebaseClock                           ( ( unsigned long ) (CPU_FREQUENCY/2) )
+
+#define configMTIME_BASE_ADDRESS                ( CLINT_CTRL_ADDR + 0xBFF8UL )
+#define configMTIMECMP_BASE_ADDRESS             ( CLINT_CTRL_ADDR + 0x4000UL )
 
 #endif /* RISCV_NOELV */
 
+#ifdef RP2350_RISCV
+
+#define TimebaseClock 1000000UL
+
+#define configMTIME_BASE_ADDRESS      ( 0xD0000000UL + 0x1B0UL )
+#define configMTIMECMP_BASE_ADDRESS   ( 0xD0000000UL + 0x1B8UL )
+
+#endif /* RP2350_RISCV */
 
 
-/* FBV 2024-11-30 When built for OSAL tests, symbol API test requires 
+
+/* FBV 2024-11-30 When built for OSAL tests, symbol API test requires
    a RAMDISK with 2048 blocks of 512 bytes.
    For OSAL tests:
    - OSAL tests RAMDISK ranges from 20 to 2048 blocks:
@@ -177,22 +193,18 @@ extern uint32_t SystemCoreClock;
      - Symbol API test uses 2000 blocks
      - Setup filesystem test uses 128 blocks
      - Some other tests use uses 20 blocks
-   - OSAL tests RAMDISKs are all dynamically allocated, hence 
+   - OSAL tests RAMDISKs are all dynamically allocated, hence
      reside in FreeRTOS heap
    For cFS/cFE:
    - The minimal cFE RAMDISK is 128 blocks.
-   - cFS RAMDISK resides in static PSP reserved memory region, 
+   - cFS RAMDISK resides in static PSP reserved memory region,
      aside CDS, Boot record, etc.
  */
 //#define PLATFORM_HEAP_SIZE                      ( (size_t)((256*1024)+(2048*512)) )
 
-
-#define configMTIME_BASE_ADDRESS                ( CLINT_CTRL_ADDR + 0xBFF8UL )
-#define configMTIMECMP_BASE_ADDRESS             ( CLINT_CTRL_ADDR + 0x4000UL )
-
 /* FBV 2014-12-1 on stack checking and stack used by ISRs
  * When configISR_STACK_SIZE_WORDS is defined, then an static array is allocated
- * Otherwise, ISR stack rely on __freertos_irq_stack_top symbol defined 
+ * Otherwise, ISR stack rely on __freertos_irq_stack_top symbol defined
  * in .ld linker script.
  *
  * ISR stack overflow checking is only feasible when using
@@ -234,14 +246,14 @@ extern uint32_t SystemCoreClock;
 
 
 // http://patorjk.com/software/taag/#f=Colossal
-//  .d8888b.                                                         
-// d88P  Y88b                                                        
-// 888    888                                                        
-// 888         .d88b.  88888b.d88b.  88888b.d88b.   .d88b.  88888b.  
-// 888        d88""88b 888 "888 "88b 888 "888 "88b d88""88b 888 "88b 
-// 888    888 888  888 888  888  888 888  888  888 888  888 888  888 
-// Y88b  d88P Y88..88P 888  888  888 888  888  888 Y88..88P 888  888 
-//  "Y8888P"   "Y88P"  888  888  888 888  888  888  "Y88P"  888  888 
+//  .d8888b.
+// d88P  Y88b
+// 888    888
+// 888         .d88b.  88888b.d88b.  88888b.d88b.   .d88b.  88888b.
+// 888        d88""88b 888 "888 "88b 888 "888 "88b d88""88b 888 "88b
+// 888    888 888  888 888  888  888 888  888  888 888  888 888  888
+// Y88b  d88P Y88..88P 888  888  888 888  888  888 Y88..88P 888  888
+//  "Y8888P"   "Y88P"  888  888  888 888  888  888  "Y88P"  888  888
 
 #ifndef portINLINE
 #define portINLINE         __inline
@@ -301,10 +313,10 @@ uint32_t HLP_ulSystemGetPerfCounter( void );
 /* FBV 2014-12-1 on stack checking and stack used by ISRs
  * Method 1: check if stack pointer within stack region range
  * Method 2: fill end of stack with canary and check
- * Methos 3: same as 2, including ISR stack 
+ * Methos 3: same as 2, including ISR stack
  * - For task stack canary seems to be 0xa5 (tskSTACK_FILL_BYTE)
  * - For ISR stack canary seems to be 0xee (portISR_STACK_FILL_BYTE)
- * Checking on ISR stack depends on configCHECK_FOR_STACK_OVERFLOW>2 AND 
+ * Checking on ISR stack depends on configCHECK_FOR_STACK_OVERFLOW>2 AND
  * explictly allocated ISR stack via configISR_STACK_SIZE_WORDS.
  */
 

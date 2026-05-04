@@ -753,6 +753,8 @@
 #define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE MAX_CONSTANT(2*1024, 6*1024)
 #elif (defined(__riscv) && (__riscv_xlen == 64) && (__riscv_flen > 0) && !defined(__linux__))
 #define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE MAX_CONSTANT(2*1024, 6*1024)
+#elif (defined(__riscv) && (__riscv_xlen == 32) && (__riscv_flen == 0) && !defined(__linux__))
+#define CFE_PLATFORM_ES_DEFAULT_STACK_SIZE MAX_CONSTANT(2*1024, 6*1024)
 #else
 #error Unknown target platform
 #endif
@@ -1843,6 +1845,8 @@
 #define CFE_PSP_RESERVED_MEMORY_SIZE (60 * 1024)
 #elif (defined(__riscv) && (__riscv_xlen == 64))
 #define CFE_PSP_RESERVED_MEMORY_SIZE (60 * 1024) // 60 KiB for MFS RAMDISK, 110 KiB for FAT RAMDISK
+#elif (defined(__riscv) && (__riscv_xlen == 32))
+#define CFE_PSP_RESERVED_MEMORY_SIZE (60 * 1024)
 #else
 #error Unknown target platform
 #endif
